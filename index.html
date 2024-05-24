@@ -35,40 +35,41 @@
         <h1>Canvas Renderer</h1>
         <textarea id="renderCode" placeholder="Write your render(ctx, state, action) function here..."></textarea>
         <button onclick="updateRenderFunction()">Update Render Function</button>
-        <textarea id="stateLimits" placeholder="Define state limits here..."></textarea>
-        <textarea id="actionLimits" placeholder="Define action limits here..."></textarea>
-        <div class="sliders" id="stateSliders"></div>
-        <div class="sliders" id="actionSliders"></div>
+        <textarea id="exampleStateAction" placeholder="Define example state and action here..."></textarea>
+        <textarea id="stateActionLimits" placeholder="Define limits for state and action here..."></textarea>
+        <div class="sliders" id="sliders"></div>
         <canvas id="canvas" width="500" height="500"></canvas>
     </div>
 
     <script>
         let renderFunction;
+        let exampleState;
+        let exampleAction;
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
 
         async function loadDefaults() {
             try {
                 const renderResponse = await fetch('./default_render.js');
-                const stateResponse = await fetch('./default_limits_state.js');
-                const actionResponse = await fetch('./default_limits_actions.js');
+                const exampleResponse = await fetch('./default_example_state_action.json');
+                const limitsResponse = await fetch('./default_limits_state_action.txt');
 
-                if (!renderResponse.ok || !stateResponse.ok || !actionResponse.ok) {
+                if (!renderResponse.ok || !exampleResponse.ok || !limitsResponse.ok) {
                     throw new Error('Failed to load default files.');
                 }
 
                 const renderCode = await renderResponse.text();
-                const stateLimits = await stateResponse.text();
-                const actionLimits = await actionResponse.text();
+                const exampleStateAction = await exampleResponse.text();
+                const stateActionLimits = await limitsResponse.text();
 
                 document.getElementById('renderCode').value = renderCode;
-                document.getElementById('stateLimits').value = stateLimits;
-                document.getElementById('actionLimits').value = actionLimits;
+                document.getElementById('exampleStateAction').value = exampleStateAction;
+                document.getElementById('stateActionLimits').value = stateActionLimits;
 
                 updateRenderFunction();
-                createSliders('stateSliders', parseLimits(stateLimits), render);
-                createSliders('actionSliders', parseLimits(actionLimits), render);
-                render(); // Render initial state
+                parseExampleStateAction(exampleStateAction);
+                createSliders(parseLimits(stateActionLimits), render);
+                render();
             } catch (error) {
                 console.error('Error loading default files:', error);
             }
@@ -80,74 +81,98 @@
             renderFunction = new Function('ctx', 'state', 'action', functionBody);
         }
 
+        function parseExampleStateAction(text) {
+            const parsed = JSON.parse(text);
+            exampleState = parsed.state;
+            exampleAction = parsed.action;
+        }
+
         function parseLimits(limitText) {
             const limits = {};
             const lines = limitText.split('\n');
             for (const line of lines) {
                 if (line.trim() !== '') {
-                    const [key, range] = line.split('=');
+                    const [path, range] = line.split('=');
                     const [min, max] = range.trim().slice(1, -1).split(',').map(Number);
-                    limits[key.trim()] = [min, max];
+                    limits[path.trim()] = [min, max];
                 }
             }
             return limits;
         }
 
-        function createSliders(containerId, limits, onChangeCallback) {
-            const container = document.getElementById(containerId);
+        function createSliders(limits, onChangeCallback) {
+            const container = document.getElementById('sliders');
             container.innerHTML = '';
-            for (const [key, [min, max]] of Object.entries(limits)) {
+            for (const [path, [min, max]] of Object.entries(limits)) {
                 const label = document.createElement('label');
-                label.textContent = key;
+                label.textContent = path;
                 const slider = document.createElement('input');
                 slider.type = 'range';
                 slider.min = min;
                 slider.max = max;
                 slider.step = (max - min) / 100;
-                slider.value = (min + max) / 2; // Start at the middle value
-                slider.oninput = onChangeCallback;
+                slider.value = getValueFromPath(path);
+                slider.oninput = () => {
+                    setValueFromPath(path, Number(slider.value));
+                    onChangeCallback();
+                };
                 container.appendChild(label);
                 container.appendChild(slider);
                 container.appendChild(document.createElement('br'));
             }
         }
 
-        function getCurrentState() {
-            const state = {};
-            const sliders = document.querySelectorAll('#stateSliders input[type="range"]');
-            sliders.forEach(slider => {
-                const key = slider.previousSibling.textContent;
-                state[key] = Number(slider.value);
-            });
-            return state;
+        function getValueFromPath(path) {
+            const keys = path.split('.');
+            let value = keys.shift() === 'state' ? exampleState : exampleAction;
+            while (keys.length) {
+                const key = keys.shift();
+                if (key.includes('[')) {
+                    const [base, index] = key.split('[');
+                    value = value[base][Number(index.slice(0, -1))];
+                } else {
+                    value = value[key];
+                }
+            }
+            return value;
         }
 
-        function getCurrentAction() {
-            const action = [];
-            const sliders = document.querySelectorAll('#actionSliders input[type="range"]');
-            sliders.forEach(slider => {
-                action.push(Number(slider.value));
-            });
-            return action;
+        function setValueFromPath(path, value) {
+            const keys = path.split('.');
+            let target = keys.shift() === 'state' ? exampleState : exampleAction;
+            while (keys.length > 1) {
+                const key = keys.shift();
+                if (key.includes('[')) {
+                    const [base, index] = key.split('[');
+                    target = target[base][Number(index.slice(0, -1))];
+                } else {
+                    target = target[key];
+                }
+            }
+            const finalKey = keys[0];
+            if (finalKey.includes('[')) {
+                const [base, index] = finalKey.split('[');
+                target[base][Number(index.slice(0, -1))] = value;
+            } else {
+                target[finalKey] = value;
+            }
         }
 
         function render() {
             if (renderFunction) {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-                const state = getCurrentState();
-                const action = getCurrentAction();
-                renderFunction(ctx, state, action);
+                renderFunction(ctx, exampleState, exampleAction);
             }
         }
 
-        document.getElementById('stateLimits').addEventListener('input', () => {
-            const stateLimits = parseLimits(document.getElementById('stateLimits').value);
-            createSliders('stateSliders', stateLimits, render);
+        document.getElementById('exampleStateAction').addEventListener('input', () => {
+            parseExampleStateAction(document.getElementById('exampleStateAction').value);
+            render();
         });
 
-        document.getElementById('actionLimits').addEventListener('input', () => {
-            const actionLimits = parseLimits(document.getElementById('actionLimits').value);
-            createSliders('actionSliders', actionLimits, render);
+        document.getElementById('stateActionLimits').addEventListener('input', () => {
+            const limits = parseLimits(document.getElementById('stateActionLimits').value);
+            createSliders(limits, render);
         });
 
         window.addEventListener('load', loadDefaults);

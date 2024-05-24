@@ -1,0 +1,6 @@
+state.position[0] = [0, 500]
+state.position[1] = [0, 500]
+state.orientation.test = [-3.14, 3.14]
+action[0] = [10, 100]
+action[1] = [0, 50]
+action[2] = [0, 10]
