@@ -26,13 +26,15 @@
             justify-content: center;
             align-items: center;
             width: 100%;
-            top: 0;
+            position: relative;
         }
         .sliders {
             display: flex;
             flex-direction: column;
             align-items: flex-end;
             margin-right: 20px;
+            overflow-y: auto;
+            max-height: 100%;
         }
         .canvas-container {
             position: relative;
@@ -50,8 +52,17 @@
         .hidden {
             display: none;
         }
-        button{
+        button {
             margin-bottom: 200px;
+        }
+        #resizeHandle {
+            width: 100%;
+            height: 10px;
+            background: #ccc;
+            cursor: ns-resize;
+            position: absolute;
+            bottom: 0;
+            left: 0;
         }
     </style>
 </head>
@@ -67,6 +78,7 @@
             <div class="canvas-container">
                 <canvas id="canvas" width="500" height="500"></canvas>
             </div>
+            <div id="resizeHandle" class="hidden"></div>
         </div>
         <textarea id="exampleStateAction" placeholder="Define example state and action here..." style="height: 150px;"></textarea>
         <textarea id="stateActionLimits" placeholder="Define limits for state and action here..." style="height: 50px;"></textarea>
@@ -81,7 +93,9 @@
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         const topSection = document.getElementById('topSection');
+        const topSectionDefaultHeight = topSection.clientHeight;
         const overlayToggle = document.getElementById('overlayToggle');
+        const resizeHandle = document.getElementById('resizeHandle');
 
         async function loadDefaults() {
             try {
@@ -113,7 +127,7 @@
             const renderCode = document.getElementById('renderCode').value;
             let functionBody = renderCode.substring(renderCode.indexOf("{") + 1, renderCode.lastIndexOf("}"));
             renderFunction = new Function('ctx', 'state', 'action', functionBody);
-            render()
+            render();
         }
 
         function parseExampleStateAction(text) {
@@ -223,12 +237,38 @@
         overlayToggle.addEventListener('change', (event) => {
             if (event.target.checked) {
                 topSection.classList.add('sticky');
+                resizeHandle.classList.remove('hidden');
             } else {
                 topSection.classList.remove('sticky');
+                resizeHandle.classList.add('hidden');
             }
         });
+
+        resizeHandle.addEventListener('mousedown', (event) => {
+            event.preventDefault();
+            document.addEventListener('mousemove', resizeOverlay);
+            document.addEventListener('mouseup', stopResizing);
+        });
+
+        function resizeOverlay(event) {
+            const newHeight = event.clientY - topSection.getBoundingClientRect().top;
+            topSection.style.height = `${newHeight}px`;
+            const scaleFactor = newHeight / topSectionDefaultHeight;
+            const canvasContainer = document.querySelector('.canvas-container');
+            const canvas = document.getElementById('canvas');
+            canvasContainer.style.transform = `scale(${scaleFactor})`;
+            canvasContainer.style.transformOrigin = 'top';
+            canvas.style.width = `${canvas.width * scaleFactor}px`;
+            canvas.style.height = `${canvas.height * scaleFactor}px`;
+        }
+
+        function stopResizing() {
+            document.removeEventListener('mousemove', resizeOverlay);
+            document.removeEventListener('mouseup', stopResizing);
+        }
 
         window.addEventListener('load', loadDefaults);
     </script>
 </body>
 </html>
+
