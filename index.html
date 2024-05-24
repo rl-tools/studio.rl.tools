@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas Renderer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+        textarea {
+            width: 400px;
+            height: 100px;
+            margin: 10px 0;
+        }
+        canvas {
+            border: 1px solid black;
+            margin-top: 20px;
+        }
+        .sliders {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Canvas Renderer</h1>
+        <textarea id="renderCode" placeholder="Write your render(ctx, state, action) function here..."></textarea>
+        <button onclick="updateRenderFunction()">Update Render Function</button>
+        <textarea id="stateLimits" placeholder="Define state limits here..."></textarea>
+        <textarea id="actionLimits" placeholder="Define action limits here..."></textarea>
+        <div class="sliders" id="stateSliders"></div>
+        <div class="sliders" id="actionSliders"></div>
+        <canvas id="canvas" width="500" height="500"></canvas>
+    </div>
+
+    <script>
+        let renderFunction;
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        async function loadDefaults() {
+            try {
+                const renderResponse = await fetch('./default_render.js');
+                const stateResponse = await fetch('./default_limits_state.js');
+                const actionResponse = await fetch('./default_limits_actions.js');
+
+                if (!renderResponse.ok || !stateResponse.ok || !actionResponse.ok) {
+                    throw new Error('Failed to load default files.');
+                }
+
+                const renderCode = await renderResponse.text();
+                const stateLimits = await stateResponse.text();
+                const actionLimits = await actionResponse.text();
+
+                document.getElementById('renderCode').value = renderCode;
+                document.getElementById('stateLimits').value = stateLimits;
+                document.getElementById('actionLimits').value = actionLimits;
+
+                updateRenderFunction();
+                createSliders('stateSliders', parseLimits(stateLimits), render);
+                createSliders('actionSliders', parseLimits(actionLimits), render);
+                render(); // Render initial state
+            } catch (error) {
+                console.error('Error loading default files:', error);
+            }
+        }
+
+        function updateRenderFunction() {
+            const renderCode = document.getElementById('renderCode').value;
+            let functionBody = renderCode.substring(renderCode.indexOf("{") + 1, renderCode.lastIndexOf("}"));
+            renderFunction = new Function('ctx', 'state', 'action', functionBody);
+        }
+
+        function parseLimits(limitText) {
+            const limits = {};
+            const lines = limitText.split('\n');
+            for (const line of lines) {
+                if (line.trim() !== '') {
+                    const [key, range] = line.split('=');
+                    const [min, max] = range.trim().slice(1, -1).split(',').map(Number);
+                    limits[key.trim()] = [min, max];
+                }
+            }
+            return limits;
+        }
+
+        function createSliders(containerId, limits, onChangeCallback) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            for (const [key, [min, max]] of Object.entries(limits)) {
+                const label = document.createElement('label');
+                label.textContent = key;
+                const slider = document.createElement('input');
+                slider.type = 'range';
+                slider.min = min;
+                slider.max = max;
+                slider.step = (max - min) / 100;
+                slider.value = (min + max) / 2; // Start at the middle value
+                slider.oninput = onChangeCallback;
+                container.appendChild(label);
+                container.appendChild(slider);
+                container.appendChild(document.createElement('br'));
+            }
+        }
+
+        function getCurrentState() {
+            const state = {};
+            const sliders = document.querySelectorAll('#stateSliders input[type="range"]');
+            sliders.forEach(slider => {
+                const key = slider.previousSibling.textContent;
+                state[key] = Number(slider.value);
+            });
+            return state;
+        }
+
+        function getCurrentAction() {
+            const action = [];
+            const sliders = document.querySelectorAll('#actionSliders input[type="range"]');
+            sliders.forEach(slider => {
+                action.push(Number(slider.value));
+            });
+            return action;
+        }
+
+        function render() {
+            if (renderFunction) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                const state = getCurrentState();
+                const action = getCurrentAction();
+                renderFunction(ctx, state, action);
+            }
+        }
+
+        document.getElementById('stateLimits').addEventListener('input', () => {
+            const stateLimits = parseLimits(document.getElementById('stateLimits').value);
+            createSliders('stateSliders', stateLimits, render);
+        });
+
+        document.getElementById('actionLimits').addEventListener('input', () => {
+            const actionLimits = parseLimits(document.getElementById('actionLimits').value);
+            createSliders('actionSliders', actionLimits, render);
+        });
+
+        window.addEventListener('load', loadDefaults);
+    </script>
+</body>
+</html>
