@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Canvas Renderer</title>
+    <title>RLtools Environment UI Design Studio</title>
     <style>
         label {
             margin-bottom: 5px;
@@ -18,8 +18,7 @@
             margin-top: 20px;
         }
         textarea {
-            width: 600px;
-            height: 150px;
+            width: 900px;
             margin: 10px 0;
         }
         #renderCode {
@@ -61,7 +60,10 @@
 </head>
 <body>
     <div class="container">
-        <h1>Canvas Renderer</h1>
+        <h1 style="margin: 2px; padding: 0px; text-align: center;">
+            <img src="logo.svg" alt="RLtools" style="display: inline; vertical-align: middle; height: 1.9em; margin-right: -0.25em">
+            Environment UI Design Studio
+        </h1>
         <label><input type="checkbox" id="overlayToggle"> Enable Overlay</label>
         <div id="topSection" class="top-section">
             <div class="sliders" id="sliders"></div>
@@ -69,8 +71,8 @@
                 <canvas id="canvas" width="500" height="500"></canvas>
             </div>
         </div>
-        <textarea id="exampleStateAction" placeholder="Define example state and action here..."></textarea>
-        <textarea id="stateActionLimits" placeholder="Define limits for state and action here..."></textarea>
+        <textarea id="exampleStateAction" placeholder="Define example state and action here..." style="height: 150px;"></textarea>
+        <textarea id="stateActionLimits" placeholder="Define limits for state and action here..." style="height: 50px;"></textarea>
         <textarea id="renderCode" placeholder="Write your render(ctx, state, action) function here..."></textarea>
         <button onclick="updateRenderFunction()">Update Render Function</button>
     </div>
