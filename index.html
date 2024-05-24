@@ -9,7 +9,7 @@
             margin-bottom: 5px;
         }
         body {
-            font-family: Arial, sans-serif;
+            font-family: "Open Sans", sans-serif;
         }
         .container {
             display: flex;
@@ -29,7 +29,6 @@
             position: relative;
             padding-top: 10px;
             padding-bottom: 20px;
-            /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); */
         }
         .sliders {
             display: flex;
@@ -79,7 +78,7 @@
             <img src="logo.svg" alt="RLtools" style="display: inline; vertical-align: middle; height: 1.9em; margin-right: -0.25em">
             Environment UI Design Studio
         </h1>
-        <label><input type="checkbox" id="overlayToggle"> Enable Overlay</label>
+        <label style="display: none;"><input type="checkbox" id="overlayToggle" checked> Enable Overlay</label>
         <div id="topSection" class="top-section">
             <div class="sliders" id="sliders"></div>
             <div class="canvas-container">
@@ -87,8 +86,11 @@
             </div>
             <div id="resizeHandle" class="hidden"></div>
         </div>
+        <h4>Define an Example State and Action for Mocking</h4>
         <textarea id="exampleStateAction" placeholder="Define example state and action here..." style="height: 150px;"></textarea>
+        <h4>Define Limits for Parts of the Example State and Action to Create Sliders</h4>
         <textarea id="stateActionLimits" placeholder="Define limits for state and action here..." style="height: 50px;"></textarea>
+        <h4>Define the Rendering Function for the Environment</h4>
         <textarea id="renderCode" placeholder="Write your render(ctx, state, action) function here..." style="height: 1000px;"></textarea>
         <button onclick="updateRenderFunction()">Update Render Function</button>
     </div>
@@ -241,14 +243,20 @@
             createSliders(limits, render);
         });
 
-        overlayToggle.addEventListener('change', (event) => {
-            if (event.target.checked) {
+        function overlayToggleCallback(checked){
+            if (checked) {
                 topSection.classList.add('sticky');
                 resizeHandle.classList.remove('hidden');
             } else {
                 topSection.classList.remove('sticky');
                 resizeHandle.classList.add('hidden');
             }
+        }
+
+        overlayToggleCallback(overlayToggle.checked);
+
+        overlayToggle.addEventListener('change', (event) => {
+            overlayToggleCallback(event.target.checked)
         });
 
         resizeHandle.addEventListener('mousedown', (event) => {
