@@ -49,8 +49,9 @@ function render(ctx, state, action) {
 
     // Draw arrowhead
     const arrowAngle = torqueMagnitude > 0 ? endAngle : startAngle;
-    const arrowX = centerX + arrowRadius * Math.cos(arrowAngle + (torqueMagnitude > 0 ? 1 : -1) * Math.PI/180*5);
-    const arrowY = centerY + arrowRadius * Math.sin(arrowAngle + (torqueMagnitude > 0 ? 1 : -1) * Math.PI/180*5);
+    const arrowHeadAngularOffset = torqueMagnitude * Math.PI/180*20
+    const arrowX = centerX + arrowRadius * Math.cos(arrowAngle + arrowHeadAngularOffset);
+    const arrowY = centerY + arrowRadius * Math.sin(arrowAngle + arrowHeadAngularOffset);
 
     const headlen = canvasWidth * 0.04 * Math.min(Math.abs(torqueMagnitude)*2, 1);
     const angleOffset = Math.PI / 6;
@@ -59,12 +60,12 @@ function render(ctx, state, action) {
     ctx.beginPath();
     ctx.moveTo(arrowX, arrowY);
     ctx.lineTo(
-        arrowX - headlen * Math.cos(arrowAngle - angleOffset + rotationAngle), 
-        arrowY - headlen * Math.sin(arrowAngle - angleOffset + rotationAngle)
+        arrowX - headlen * Math.cos(arrowAngle + arrowHeadAngularOffset/2 - angleOffset + rotationAngle), 
+        arrowY - headlen * Math.sin(arrowAngle + arrowHeadAngularOffset/2 - angleOffset + rotationAngle)
     );
     ctx.lineTo(
-        arrowX - headlen * Math.cos(arrowAngle + angleOffset + rotationAngle), 
-        arrowY - headlen * Math.sin(arrowAngle + angleOffset + rotationAngle)
+        arrowX - headlen * Math.cos(arrowAngle + arrowHeadAngularOffset/2 + angleOffset + rotationAngle), 
+        arrowY - headlen * Math.sin(arrowAngle + arrowHeadAngularOffset/2 + angleOffset + rotationAngle)
     );
     ctx.lineTo(arrowX, arrowY);
     ctx.fillStyle = 'black';
