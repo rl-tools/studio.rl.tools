@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Canvas Renderer</title>
     <style>
+        label {
+            margin-bottom: 5px;
+        }
         body {
             font-family: Arial, sans-serif;
         }
@@ -15,9 +18,13 @@
             margin-top: 20px;
         }
         textarea {
-            width: 400px;
-            height: 100px;
+            width: 600px;
+            height: 150px;
             margin: 10px 0;
+        }
+        #renderCode {
+            height: 300px;
+            margin-bottom: 20px;
         }
         .top-section {
             display: flex;
@@ -34,6 +41,9 @@
         }
         .canvas-container {
             position: relative;
+        }
+        #canvas {
+            border: 1px solid black;
         }
         .sticky {
             position: sticky;
@@ -90,10 +100,9 @@
                 document.getElementById('exampleStateAction').value = exampleStateAction;
                 document.getElementById('stateActionLimits').value = stateActionLimits;
 
-                updateRenderFunction();
                 parseExampleStateAction(exampleStateAction);
                 createSliders(parseLimits(stateActionLimits), render);
-                render();
+                updateRenderFunction();
             } catch (error) {
                 console.error('Error loading default files:', error);
             }
@@ -103,6 +112,7 @@
             const renderCode = document.getElementById('renderCode').value;
             let functionBody = renderCode.substring(renderCode.indexOf("{") + 1, renderCode.lastIndexOf("}"));
             renderFunction = new Function('ctx', 'state', 'action', functionBody);
+            render()
         }
 
         function parseExampleStateAction(text) {
@@ -185,6 +195,7 @@
         function render() {
             if (renderFunction) {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
+                requestAnimationFrame(() => renderFunction(ctx, exampleState, exampleAction));
                 renderFunction(ctx, exampleState, exampleAction);
             }
         }
