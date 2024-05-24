@@ -71,5 +71,3 @@ function render(ctx, state, action) {
     ctx.fillStyle = 'black';
     ctx.fill();
 }
-
-
