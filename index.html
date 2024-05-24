@@ -27,7 +27,11 @@
         <h4>Define the Rendering Function for the Environment</h4>
         <textarea id="renderCode" placeholder="Write your render(ctx, state, action) function here..."></textarea>
         </br>
-        <button onclick="updateRenderFunction()" class="fancy-button">Update [ ctrl+enter ]</button>
+        <div>
+            <input type="button" id="resetButton" class="fancy-button" value="Reset">
+            <input type="button" id="updateButton" class="fancy-button" value="Update [ctrl+enter]">
+        </div>
+        </br>
     </div>
 
     <script src="index.js" type="module"></script>

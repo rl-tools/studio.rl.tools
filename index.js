@@ -196,4 +196,10 @@ function stopResizing() {
     document.removeEventListener('mouseup', stopResizing);
 }
 
-window.addEventListener('load', loadDefaults);
+window.addEventListener('load', () => {
+    loadDefaults();
+    const updateButton = document.getElementById('updateButton');
+    updateButton.addEventListener('click', updateRenderFunction);
+    const resetButton = document.getElementById('resetButton');
+    resetButton.addEventListener('click', loadDefaults);
+})
