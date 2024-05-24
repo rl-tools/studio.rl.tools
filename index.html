@@ -24,9 +24,12 @@
         .top-section {
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             width: 100%;
             position: relative;
+            padding-top: 10px;
+            padding-bottom: 20px;
+            /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); */
         }
         .sliders {
             display: flex;
@@ -38,10 +41,13 @@
         }
         .canvas-container {
             position: relative;
-            padding-bottom: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         #canvas {
             border: 1px solid black;
+            transform-origin: top;
         }
         .sticky {
             position: sticky;
@@ -94,7 +100,6 @@
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         const topSection = document.getElementById('topSection');
-        const topSectionDefaultHeight = topSection.clientHeight;
         const overlayToggle = document.getElementById('overlayToggle');
         const resizeHandle = document.getElementById('resizeHandle');
 
@@ -191,6 +196,7 @@
             }
             return value;
         }
+
         function setValueFromPath(path, value) {
             if (path.startsWith('state')) {
                 const keys = path.replace('state.', '').split('.');
@@ -254,10 +260,11 @@
         function resizeOverlay(event) {
             const newHeight = event.clientY - topSection.getBoundingClientRect().top;
             topSection.style.height = `${newHeight}px`;
-            const scaleFactor = newHeight / topSectionDefaultHeight;
+            const scaleFactor = newHeight / canvas.height;
+            canvas.style.transform = `scale(${scaleFactor})`;
             const canvasContainer = document.querySelector('.canvas-container');
-            const canvas = document.getElementById('canvas');
-            canvasContainer.style.transform = `scale(${scaleFactor})`;
+            canvasContainer.style.width = `${canvas.width * scaleFactor}px`;
+            canvasContainer.style.width = `${canvas.height * scaleFactor}px`;
         }
 
         function stopResizing() {
