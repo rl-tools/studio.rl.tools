@@ -62,12 +62,12 @@ function updateRenderFunction() {
     try {
         let functionBody = renderCode.substring(renderCode.indexOf("{") + 1, renderCode.lastIndexOf("}"));
         renderFunction = new Function('ctx', 'state', 'action', functionBody);
+        render();
     }
     catch (error) {
         alert(`Error parsing the render function:\n${error.message}\nYou might want to reset to default values (button at the bottom of the page).`)
         return
     }
-    render();
 }
 
 function parseExampleStateAction(text) {
