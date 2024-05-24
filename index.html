@@ -146,12 +146,17 @@
                 slider.max = max;
                 slider.step = (max - min) / 100;
                 slider.value = getValueFromPath(path);
+                const valueDisplay = document.createElement('span');
+                valueDisplay.textContent = Number(slider.value).toPrecision(3);
+
                 slider.oninput = () => {
                     setValueFromPath(path, Number(slider.value));
+                    valueDisplay.textContent = Number(slider.value).toPrecision(3);
                     onChangeCallback();
                 };
                 container.appendChild(label);
                 container.appendChild(slider);
+                container.appendChild(valueDisplay);
                 container.appendChild(document.createElement('br'));
             }
         }
@@ -226,4 +231,3 @@
     </script>
 </body>
 </html>
-

@@ -9,8 +9,11 @@ function render(ctx, state, action) {
     const bobRadius = canvasWidth * 0.02; 
     const pivotRadius = canvasWidth * 0.01;
 
-    const pendulumX = centerX + pendulumLength * Math.sin(state.theta);
-    const pendulumY = centerY + pendulumLength * Math.cos(state.theta);
+    // Adjust theta to be 0 when pendulum is downwards
+    const adjustedTheta = state.theta - Math.PI;
+
+    const pendulumX = centerX + pendulumLength * Math.sin(adjustedTheta);
+    const pendulumY = centerY + pendulumLength * Math.cos(adjustedTheta);
 
     ctx.beginPath();
     ctx.moveTo(centerX, centerY);
@@ -31,21 +34,29 @@ function render(ctx, state, action) {
     ctx.fill();
     ctx.stroke();
 
-    const torqueMagnitude = action[0];
-    const arrowRadius = canvasWidth * 0.04 + canvasWidth * 0.06 * Math.abs(torqueMagnitude);
-    const arrowAngle = torqueMagnitude > 0 ? -Math.PI / 2 : Math.PI / 2;
+    // Draw torque arc
+    const torqueMagnitude = -action[0];
+    const arrowRadius = canvasWidth * 0.08
+    const magnitudeRadians = (Math.PI * 2 / 3 * torqueMagnitude);
+    const startAngle = Math.PI/2 + (torqueMagnitude > 0 ? 0 : magnitudeRadians); 
+    const endAngle   = Math.PI/2 + (torqueMagnitude < 0 ? 0 : magnitudeRadians);
 
     ctx.beginPath();
-    ctx.arc(centerX, centerY, arrowRadius, 0, 2 * Math.PI);
+    ctx.arc(centerX, centerY, arrowRadius, startAngle, endAngle);
     ctx.strokeStyle = 'black';
+    ctx.lineWidth = canvasWidth * 0.008;
     ctx.stroke();
 
-    ctx.beginPath();
+    // Draw arrowhead
+    const arrowAngle = torqueMagnitude > 0 ? endAngle : startAngle;
     const arrowX = centerX + arrowRadius * Math.cos(arrowAngle);
     const arrowY = centerY + arrowRadius * Math.sin(arrowAngle);
+
+    ctx.beginPath();
     ctx.moveTo(arrowX, arrowY);
     ctx.lineTo(arrowX - canvasWidth * 0.02 * Math.cos(arrowAngle - 0.3), arrowY - canvasWidth * 0.02 * Math.sin(arrowAngle - 0.3));
     ctx.moveTo(arrowX, arrowY);
     ctx.lineTo(arrowX - canvasWidth * 0.02 * Math.cos(arrowAngle + 0.3), arrowY - canvasWidth * 0.02 * Math.sin(arrowAngle + 0.3));
     ctx.stroke();
 }
+
