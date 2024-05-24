@@ -1,7 +1,7 @@
 {
     "state": {
-        "position": [250, 250],
-        "orientation": {"test": 0}
+        "theta": 0,
+        "theta_dot": 0
     },
-    "action": [50, 20, 5]
+    "action": [0]
 }

@@ -170,25 +170,29 @@
             }
             return value;
         }
-
         function setValueFromPath(path, value) {
-            const keys = path.split('.');
-            let target = keys.shift() === 'state' ? exampleState : exampleAction;
-            while (keys.length > 1) {
-                const key = keys.shift();
-                if (key.includes('[')) {
-                    const [base, index] = key.split('[');
-                    target = target[base][Number(index.slice(0, -1))];
-                } else {
-                    target = target[key];
+            if (path.startsWith('state')) {
+                const keys = path.replace('state.', '').split('.');
+                let target = exampleState;
+                while (keys.length > 1) {
+                    const key = keys.shift();
+                    if (key.includes('[')) {
+                        const [base, index] = key.split('[');
+                        target = target[base][Number(index.slice(0, -1))];
+                    } else {
+                        target = target[key];
+                    }
                 }
-            }
-            const finalKey = keys[0];
-            if (finalKey.includes('[')) {
-                const [base, index] = finalKey.split('[');
-                target[base][Number(index.slice(0, -1))] = value;
-            } else {
-                target[finalKey] = value;
+                const finalKey = keys[0];
+                if (finalKey.includes('[')) {
+                    const [base, index] = finalKey.split('[');
+                    target[base][Number(index.slice(0, -1))] = value;
+                } else {
+                    target[finalKey] = value;
+                }
+            } else if (path.startsWith('action')) {
+                const index = path.match(/\d+/)[0]; // Extract the index from "action[0]"
+                exampleAction[Number(index)] = value;
             }
         }
 
