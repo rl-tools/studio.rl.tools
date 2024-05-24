@@ -18,32 +18,55 @@ async function loadDefaults() {
             throw new Error('Failed to load default files.');
         }
 
-        const renderCode = await renderResponse.text();
-        const exampleStateAction = await exampleResponse.text();
-        const stateActionLimits = await limitsResponse.text();
-
-        const renderCodeTextarea = document.getElementById('renderCode')
-        renderCodeTextarea.value = renderCode;
-        renderCodeTextarea.rows = renderCode.split('\n').length;
+        let exampleStateAction = localStorage.getItem("example_state_action") != null ? localStorage.getItem("example_state_action") : await exampleResponse.text();
         const exampleStateActionTextarea = document.getElementById('exampleStateAction')
         exampleStateActionTextarea.value = exampleStateAction;
         exampleStateActionTextarea.rows = exampleStateAction.split('\n').length;
+
+        const renderCode = localStorage.getItem("render") != null ? localStorage.getItem("render") : await renderResponse.text();
+        const renderCodeTextarea = document.getElementById('renderCode')
+        renderCodeTextarea.value = renderCode;
+        renderCodeTextarea.rows = renderCode.split('\n').length;
+
+        const stateActionLimits = localStorage.getItem("limits_state_action") != null ? localStorage.getItem("limits_state_action") : await limitsResponse.text();
         const stateActionLimitsTextarea = document.getElementById('stateActionLimits')
         stateActionLimitsTextarea.value = stateActionLimits;
         stateActionLimitsTextarea.rows = stateActionLimits.split('\n').length;
 
-        parseExampleStateAction(exampleStateAction);
-        createSliders(parseLimits(stateActionLimits), render);
-        updateRenderFunction();
+        // parseExampleStateAction(exampleStateAction);
+        // createSliders(parseLimits(stateActionLimits), render);
+        setTimeout(updateRenderFunction, 100);
     } catch (error) {
         console.error('Error loading default files:', error);
     }
 }
 
 function updateRenderFunction() {
+    try {
+        parseExampleStateAction(document.getElementById('exampleStateAction').value);
+    }
+    catch (error) {
+        alert(`Error parsing example state and action:\n${error.message}\nYou might want to reset to default values (button at the bottom of the page).`);
+        return
+    }
+
+    try {
+        createSliders(parseLimits(document.getElementById('stateActionLimits').value), render)
+    }
+    catch (error) {
+        alert(`Error parsing state and action limits:\n${error}\nYou might want to reset to default values (button at the bottom of the page).`)
+        return
+    }
     const renderCode = document.getElementById('renderCode').value;
-    let functionBody = renderCode.substring(renderCode.indexOf("{") + 1, renderCode.lastIndexOf("}"));
-    renderFunction = new Function('ctx', 'state', 'action', functionBody);
+    localStorage.setItem("render", renderCode)
+    try {
+        let functionBody = renderCode.substring(renderCode.indexOf("{") + 1, renderCode.lastIndexOf("}"));
+        renderFunction = new Function('ctx', 'state', 'action', functionBody);
+    }
+    catch (error) {
+        alert(`Error parsing the render function:\n${error.message}\nYou might want to reset to default values (button at the bottom of the page).`)
+        return
+    }
     render();
 }
 
@@ -143,21 +166,24 @@ function render() {
 }
 
 document.getElementById('exampleStateAction').addEventListener('input', () => {
-    parseExampleStateAction(document.getElementById('exampleStateAction').value);
-    render();
+    localStorage.setItem("example_state_action", document.getElementById('exampleStateAction').value)
 });
 
 document.getElementById('stateActionLimits').addEventListener('input', () => {
-    const limits = parseLimits(document.getElementById('stateActionLimits').value);
-    createSliders(limits, render);
+    localStorage.setItem("limits_state_action", document.getElementById('stateActionLimits').value)
 });
 
-document.getElementById('renderCode').addEventListener('keydown', (event) => {
+
+function ctrl_enter_callback(event){
     if (event.ctrlKey && event.key === 'Enter') {
         event.preventDefault();
         updateRenderFunction();
     }
-});
+} 
+
+document.getElementById('renderCode').addEventListener('keydown', ctrl_enter_callback);
+document.getElementById('exampleStateAction').addEventListener('keydown', ctrl_enter_callback);
+document.getElementById('stateActionLimits').addEventListener('keydown', ctrl_enter_callback);
 
 function overlayToggleCallback(checked){
     if (checked) {
@@ -196,10 +222,24 @@ function stopResizing() {
     document.removeEventListener('mouseup', stopResizing);
 }
 
+
+function resetButtonCallback(){
+    if(localStorage.getItem("example_state_action") != null){
+        localStorage.removeItem("example_state_action")
+    }
+    if(localStorage.getItem("limits_state_action") != null){
+        localStorage.removeItem("limits_state_action")
+    }
+    if(localStorage.getItem("render") != null){
+        localStorage.removeItem("render")
+    }
+    loadDefaults();
+}
+
 window.addEventListener('load', () => {
     loadDefaults();
     const updateButton = document.getElementById('updateButton');
     updateButton.addEventListener('click', updateRenderFunction);
     const resetButton = document.getElementById('resetButton');
-    resetButton.addEventListener('click', loadDefaults);
+    resetButton.addEventListener('click', resetButtonCallback);
 })
