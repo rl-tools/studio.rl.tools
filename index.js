@@ -2,11 +2,13 @@
 let renderFunction;
 let exampleState;
 let exampleAction;
+let stateActionLimits;
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const topSection = document.getElementById('topSection');
 const overlayToggle = document.getElementById('overlayToggle');
 const resizeHandle = document.getElementById('resizeHandle');
+const resizeHandleInner = document.getElementById('resizeHandleInner');
 
 async function loadDefaults() {
     try {
@@ -33,8 +35,6 @@ async function loadDefaults() {
         stateActionLimitsTextarea.value = stateActionLimits;
         stateActionLimitsTextarea.rows = stateActionLimits.split('\n').length;
 
-        // parseExampleStateAction(exampleStateAction);
-        // createSliders(parseLimits(stateActionLimits), render);
         setTimeout(updateRenderFunction, 100);
     } catch (error) {
         console.error('Error loading default files:', error);
@@ -51,7 +51,8 @@ function updateRenderFunction() {
     }
 
     try {
-        createSliders(parseLimits(document.getElementById('stateActionLimits').value), render)
+        stateActionLimits = parseLimits(document.getElementById('stateActionLimits').value)
+        createSliders(stateActionLimits, render)
     }
     catch (error) {
         alert(`Error parsing state and action limits:\n${error}\nYou might want to reset to default values (button at the bottom of the page).`)
@@ -155,6 +156,10 @@ function setValueFromPath(path, value) {
         const index = path.match(/\d+/)[0]; // Extract the index from "action[0]"
         exampleAction[Number(index)] = value;
     }
+    const exampleStateActionTextarea = document.getElementById('exampleStateAction')
+    exampleStateActionTextarea.value = JSON.stringify({ state: exampleState, action: exampleAction }, null, 4);
+    const stateActionTextareaEvent = new Event('input');
+    exampleStateActionTextarea.dispatchEvent(stateActionTextareaEvent);
 }
 
 function render() {
@@ -189,9 +194,11 @@ function overlayToggleCallback(checked){
     if (checked) {
         topSection.classList.add('sticky');
         resizeHandle.classList.remove('hidden');
+        resizeHandleInner.classList.remove('hidden');
     } else {
         topSection.classList.remove('sticky');
         resizeHandle.classList.add('hidden');
+        resizeHandleInner.classList.add('hidden');
     }
 }
 
@@ -208,7 +215,7 @@ resizeHandle.addEventListener('mousedown', (event) => {
 });
 
 function resizeOverlay(event) {
-    const newHeight = event.clientY - topSection.getBoundingClientRect().top;
+    const newHeight = event.clientY - topSection.getBoundingClientRect().top - 20; // -20 for the padding
     topSection.style.height = `${newHeight}px`;
     const scaleFactor = newHeight / canvas.height;
     canvas.style.transform = `scale(${scaleFactor})`;

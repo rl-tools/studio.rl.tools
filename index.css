@@ -70,13 +70,33 @@ button {
 }
 #resizeHandle {
     width: 100%;
-    height: 10px;
-    background: #ccc;
+    height: 15px;
+    background: repeating-linear-gradient(
+        45deg,
+        #ccc,
+        #ccc 10px,
+        #ddd 10px,
+        #ddd 20px
+    );
     cursor: ns-resize;
     position: absolute;
     bottom: 0;
     left: 0;
 }
+#resizeHandleInner {
+    width: 50px;
+    height: 6px;
+    background: #ffffff;
+    border-radius: 3px;
+    cursor: ns-resize;
+    position: absolute;
+    bottom: 4.5px;
+    left: 50%;
+    transform: translateX(-50%);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+
 
 .fancy-button {
     display: inline-block;
