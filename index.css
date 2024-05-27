@@ -137,8 +137,11 @@ button {
 .left-buttons {
     display: flex;
 }
-.left-buttons input:first-child {
-    margin-right: 15px; 
+.left-buttons input {
+    margin-right: 10px; 
+}
+.left-buttons input:last-child {
+    margin-right: 0; 
 }
 .center-filler {
     flex-grow: 1;
@@ -194,3 +197,19 @@ button {
     box-shadow: 0 4px 7.5px rgba(0, 0, 0, 0.3);
 }
 
+
+.info-container{
+    width: 900px;
+    margin-bottom: 15px;
+}
+
+
+code {
+    background-color: #f6f8fa;
+    border-radius: 6px;
+    font-family: monospace;
+    padding: 2px 4px;
+    font-size: 90%;
+    color: #d63384;
+    border: 1px solid #d1d5da;
+}

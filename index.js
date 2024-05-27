@@ -231,22 +231,26 @@ function stopResizing() {
 
 
 function resetButtonCallback(example){
-    if(localStorage.getItem("example_state_action") != null){
-        localStorage.removeItem("example_state_action")
+    const confirmed = confirm(`Are you sure you want to load the ${example} example? This will overwrite your changes`)
+    if (confirmed){
+        if(localStorage.getItem("example_state_action") != null){
+            localStorage.removeItem("example_state_action")
+        }
+        if(localStorage.getItem("limits_state_action") != null){
+            localStorage.removeItem("limits_state_action")
+        }
+        if(localStorage.getItem("render") != null){
+            localStorage.removeItem("render")
+        }
+        loadDefaults(example);
     }
-    if(localStorage.getItem("limits_state_action") != null){
-        localStorage.removeItem("limits_state_action")
-    }
-    if(localStorage.getItem("render") != null){
-        localStorage.removeItem("render")
-    }
-    loadDefaults(example);
 }
 
 window.addEventListener('load', () => {
-    loadDefaults("pendulum");
+    loadDefaults("pendulum-simple");
     const updateButton = document.getElementById('updateButton');
     updateButton.addEventListener('click', updateRenderFunction);
+    document.getElementById('resetButtonPendulumSimple').addEventListener('click', () => resetButtonCallback("pendulum-simple"));
     document.getElementById('resetButtonPendulum').addEventListener('click', () => resetButtonCallback("pendulum"));
     document.getElementById('resetButtonAcrobot').addEventListener('click', () => resetButtonCallback("acrobot"));
 })

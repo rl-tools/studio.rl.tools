@@ -23,16 +23,20 @@
             </div>
         </div>
         <h4>Define an Example State and Action for Mocking</h4>
+        <div class="info-container">This is the state of your environment and should have the structure returned by the <code>rl_tools::serialize_json</code> function of your environment (<a href="https://github.com/rl-tools/rl-tools/blob/002e8237729a24bbc233a8232d7dd89416cc1aa9/include/rl_tools/rl/environments/pendulum/operations_cpu.h#L14">example</a>)</div>
         <textarea id="exampleStateAction" placeholder="Define example state and action here..."></textarea>
-        <h4>Define Limits for Parts of the Example State and Action to Create Sliders</h4>
+        <h4>Define Limits for Parts of the Example State and Action</h4>
+        <div class="info-container">For each of the defined limits a slider will be created for interactive mocking</div>
         <textarea id="stateActionLimits" placeholder="Define limits for state and action here..."></textarea>
         <h4>Define the Rendering Function for the Environment</h4>
+        <div class="info-container">The context is a <a href="https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D">CanvasRenderingContext2D</a> which exposes a simple and stable (HTML5) API for drawing 2D content in web-browsers.</div>
         <textarea id="renderCode" placeholder="Write your render(ctx, state, action) function here..."></textarea>
         </br>
         <div class="button-container">
             <div class="left-buttons">
-                <input type="button" id="resetButtonPendulum" class="fancy-button-small" value="Reset: Pendulum">
-                <input type="button" id="resetButtonAcrobot" class="fancy-button-small" value="Reset: Acrobot">
+                <input type="button" id="resetButtonPendulumSimple" class="fancy-button-small" value="Pendulum (simple)">
+                <input type="button" id="resetButtonPendulum" class="fancy-button-small" value="Pendulum">
+                <input type="button" id="resetButtonAcrobot" class="fancy-button-small" value="Acrobot">
             </div>
             <div class="center-filler"></div>
             <div class="right-button">

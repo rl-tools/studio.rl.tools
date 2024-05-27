@@ -1,0 +1,9 @@
+{
+    "state": {
+        "theta": -0.5032,
+        "theta_dot": 0
+    },
+    "action": [
+        0.7
+    ]
+}
