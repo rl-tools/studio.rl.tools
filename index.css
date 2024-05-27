@@ -97,7 +97,58 @@ button {
 }
 
 
+.button-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
 
+#updateButton {
+    margin-left: auto;
+}
+
+
+.button-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+#resetButtonPendulum,
+#resetButtonAcrobot {
+    flex-grow: 0;
+}
+
+/* #updateButton {
+    flex-grow: 0;
+    margin-left: auto;
+} */
+
+/* existing styles */
+
+.button-container {
+    width: 900px;
+    display: flex;
+    /* justify-content: left; */
+    align-items: center;
+    margin-top: 10px;
+}
+
+.left-buttons {
+    display: flex;
+}
+.left-buttons input:first-child {
+    margin-right: 15px; 
+}
+.center-filler {
+    flex-grow: 1;
+}
+
+.right-button {
+    display: flex;
+}
+
+/* existing styles */
 .fancy-button {
     display: inline-block;
     margin: 5px;
@@ -143,8 +194,3 @@ button {
     box-shadow: 0 4px 7.5px rgba(0, 0, 0, 0.3);
 }
 
-.button-container{
-    /* display: flex; */
-    justify-content: center;
-    margin-top: 20px;
-}
