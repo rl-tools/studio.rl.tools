@@ -10,11 +10,11 @@ const overlayToggle = document.getElementById('overlayToggle');
 const resizeHandle = document.getElementById('resizeHandle');
 const resizeHandleInner = document.getElementById('resizeHandleInner');
 
-async function loadDefaults() {
+async function loadDefaults(example) {
     try {
-        const renderResponse = await fetch('./default_render.js');
-        const exampleResponse = await fetch('./default_example_state_action.json');
-        const limitsResponse = await fetch('./default_limits_state_action.txt');
+        const renderResponse = await fetch(`./examples/${example}/render.js`);
+        const exampleResponse = await fetch(`./examples/${example}/example_state_action.json`);
+        const limitsResponse = await fetch(`./examples/${example}/limits_state_action.txt`);
 
         if (!renderResponse.ok || !exampleResponse.ok || !limitsResponse.ok) {
             throw new Error('Failed to load default files.');
@@ -230,7 +230,7 @@ function stopResizing() {
 }
 
 
-function resetButtonCallback(){
+function resetButtonCallback(example){
     if(localStorage.getItem("example_state_action") != null){
         localStorage.removeItem("example_state_action")
     }
@@ -240,13 +240,13 @@ function resetButtonCallback(){
     if(localStorage.getItem("render") != null){
         localStorage.removeItem("render")
     }
-    loadDefaults();
+    loadDefaults(example);
 }
 
 window.addEventListener('load', () => {
-    loadDefaults();
+    loadDefaults("pendulum");
     const updateButton = document.getElementById('updateButton');
     updateButton.addEventListener('click', updateRenderFunction);
-    const resetButton = document.getElementById('resetButton');
-    resetButton.addEventListener('click', resetButtonCallback);
+    document.getElementById('resetButtonPendulum').addEventListener('click', () => resetButtonCallback("pendulum"));
+    document.getElementById('resetButtonAcrobot').addEventListener('click', () => resetButtonCallback("acrobot"));
 })

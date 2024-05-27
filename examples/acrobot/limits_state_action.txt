@@ -1,0 +1,3 @@
+state.theta1 = [-3.145, 3.145]
+state.theta2 = [-3.145, 3.145]
+action[0] = [-1, 1]
