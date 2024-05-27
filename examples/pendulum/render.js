@@ -24,7 +24,7 @@ function render(ctx, state, action) {
 
     ctx.beginPath();
     ctx.arc(pendulumX, pendulumY, bobRadius, 0, 2 * Math.PI);
-    ctx.fillStyle = 'red';
+    ctx.fillStyle = '#7DB9B6';
     ctx.fill();
     ctx.stroke();
 
