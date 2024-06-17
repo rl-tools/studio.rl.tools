@@ -54,8 +54,8 @@ function render(ctx, state, action) {
     const torqueMagnitude = -action[0];
     const arrowRadius = canvasWidth * 0.08;
     const magnitudeRadians = (Math.PI * 2 / 3 * torqueMagnitude);
-    const startAngle = Math.PI / 2 + (torqueMagnitude > 0 ? 0 : magnitudeRadians) - state.theta1; 
-    const endAngle = Math.PI / 2 + (torqueMagnitude < 0 ? 0 : magnitudeRadians) - state.theta1;
+    const startAngle =-Math.PI/2 + (torqueMagnitude > 0 ? 0 : magnitudeRadians) - state.theta1; 
+    const endAngle = -Math.PI/2 + (torqueMagnitude < 0 ? 0 : magnitudeRadians) - state.theta1;
 
     ctx.beginPath();
     ctx.arc(pendulumX1, pendulumY1, arrowRadius, startAngle, endAngle);
