@@ -24,6 +24,7 @@ async function loadDefaults(example) {
         const exampleStateActionTextarea = document.getElementById('exampleStateAction')
         exampleStateActionTextarea.value = exampleStateAction;
         exampleStateActionTextarea.rows = exampleStateAction.split('\n').length;
+        localStorage.setItem("example_state_action", exampleStateAction)
 
         const renderCode = localStorage.getItem("render") != null ? localStorage.getItem("render") : await renderResponse.text();
         const renderCodeTextarea = document.getElementById('renderCode')
@@ -34,6 +35,7 @@ async function loadDefaults(example) {
         const stateActionLimitsTextarea = document.getElementById('stateActionLimits')
         stateActionLimitsTextarea.value = stateActionLimits;
         stateActionLimitsTextarea.rows = stateActionLimits.split('\n').length;
+        localStorage.setItem("limits_state_action", stateActionLimits)
 
         setTimeout(updateRenderFunction, 100);
     } catch (error) {
