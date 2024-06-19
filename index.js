@@ -1,7 +1,7 @@
 
 let renderFunction;
-let exampleState;
-let exampleAction;
+let exampleStateAction;
+let exampleParameters;
 let stateActionLimits;
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
@@ -10,28 +10,35 @@ const overlayToggle = document.getElementById('overlayToggle');
 const resizeHandle = document.getElementById('resizeHandle');
 const resizeHandleInner = document.getElementById('resizeHandleInner');
 
-async function loadDefaults(example) {
+async function loadDefaults(example, forceReload) {
     try {
         const renderResponse = await fetch(`./examples/${example}/render.js`);
-        const exampleResponse = await fetch(`./examples/${example}/example_state_action.json`);
+        const exampleParametersResponse = await fetch(`./examples/${example}/example_parameters.json`);
+        const exampleStateActionResponse = await fetch(`./examples/${example}/example_state_action.json`);
         const limitsResponse = await fetch(`./examples/${example}/limits_state_action.txt`);
 
-        if (!renderResponse.ok || !exampleResponse.ok || !limitsResponse.ok) {
+        if (!renderResponse.ok || !exampleParametersResponse.ok || !exampleStateActionResponse.ok || !limitsResponse.ok) {
             throw new Error('Failed to load default files.');
         }
 
-        let exampleStateAction = localStorage.getItem("example_state_action") != null ? localStorage.getItem("example_state_action") : await exampleResponse.text();
+        exampleParameters = localStorage.getItem("example_parameters") != null && !forceReload ? localStorage.getItem("example_parameters") : await exampleParametersResponse.text();
+        const exampleParametersTextarea = document.getElementById('exampleParameters')
+        exampleParametersTextarea.value = exampleParameters;
+        exampleParametersTextarea.rows = exampleParameters.split('\n').length;
+        localStorage.setItem("example_parameters", exampleParameters)
+
+        exampleStateAction = localStorage.getItem("example_state_action") != null && !forceReload ? localStorage.getItem("example_state_action") : await exampleStateActionResponse.text();
         const exampleStateActionTextarea = document.getElementById('exampleStateAction')
         exampleStateActionTextarea.value = exampleStateAction;
         exampleStateActionTextarea.rows = exampleStateAction.split('\n').length;
         localStorage.setItem("example_state_action", exampleStateAction)
 
-        const renderCode = localStorage.getItem("render") != null ? localStorage.getItem("render") : await renderResponse.text();
+        const renderCode = localStorage.getItem("render") != null && !forceReload ? localStorage.getItem("render") : await renderResponse.text();
         const renderCodeTextarea = document.getElementById('renderCode')
         renderCodeTextarea.value = renderCode;
         renderCodeTextarea.rows = renderCode.split('\n').length;
 
-        const stateActionLimits = localStorage.getItem("limits_state_action") != null ? localStorage.getItem("limits_state_action") : await limitsResponse.text();
+        const stateActionLimits = localStorage.getItem("limits_state_action") != null && !forceReload ? localStorage.getItem("limits_state_action") : await limitsResponse.text();
         const stateActionLimitsTextarea = document.getElementById('stateActionLimits')
         stateActionLimitsTextarea.value = stateActionLimits;
         stateActionLimitsTextarea.rows = stateActionLimits.split('\n').length;
@@ -45,7 +52,14 @@ async function loadDefaults(example) {
 
 function updateRenderFunction() {
     try {
-        parseExampleStateAction(document.getElementById('exampleStateAction').value);
+        exampleParameters = JSON.parse(document.getElementById('exampleParameters').value);
+    }
+    catch (error) {
+        alert(`Error parsing example parameters:\n${error.message}\nYou might want to reset to default values (button at the bottom of the page).`);
+        return
+    }
+    try {
+        exampleStateAction = JSON.parse(document.getElementById('exampleStateAction').value);
     }
     catch (error) {
         alert(`Error parsing example state and action:\n${error.message}\nYou might want to reset to default values (button at the bottom of the page).`);
@@ -64,19 +78,13 @@ function updateRenderFunction() {
     localStorage.setItem("render", renderCode)
     try {
         let functionBody = renderCode.substring(renderCode.indexOf("{") + 1, renderCode.lastIndexOf("}"));
-        renderFunction = new Function('ctx', 'state', 'action', functionBody);
+        renderFunction = new Function('ctx', 'parameters', 'state', 'action', functionBody);
         render();
     }
     catch (error) {
         alert(`Error parsing the render function:\n${error.message}\nYou might want to reset to default values (button at the bottom of the page).`)
         return
     }
-}
-
-function parseExampleStateAction(text) {
-    const parsed = JSON.parse(text);
-    exampleState = parsed.state;
-    exampleAction = parsed.action;
 }
 
 function parseLimits(limitText) {
@@ -121,7 +129,7 @@ function createSliders(limits, onChangeCallback) {
 
 function getValueFromPath(path) {
     const keys = path.split('.');
-    let value = keys.shift() === 'state' ? exampleState : exampleAction;
+    let value = exampleStateAction;
     while (keys.length) {
         const key = keys.shift();
         if (key.includes('[')) {
@@ -135,17 +143,11 @@ function getValueFromPath(path) {
 }
 
 function setValueFromPath(path, value) {
-    if (path.startsWith('state')) {
-        const keys = path.replace('state.', '').split('.');
-        let target = exampleState;
+        const keys = path.split('.');
+        let target = exampleStateAction;
         while (keys.length > 1) {
             const key = keys.shift();
-            if (key.includes('[')) {
-                const [base, index] = key.split('[');
-                target = target[base][Number(index.slice(0, -1))];
-            } else {
-                target = target[key];
-            }
+            target = target[key];
         }
         const finalKey = keys[0];
         if (finalKey.includes('[')) {
@@ -154,12 +156,8 @@ function setValueFromPath(path, value) {
         } else {
             target[finalKey] = value;
         }
-    } else if (path.startsWith('action')) {
-        const index = path.match(/\d+/)[0]; // Extract the index from "action[0]"
-        exampleAction[Number(index)] = value;
-    }
     const exampleStateActionTextarea = document.getElementById('exampleStateAction')
-    exampleStateActionTextarea.value = JSON.stringify({ state: exampleState, action: exampleAction }, null, 4);
+    exampleStateActionTextarea.value = JSON.stringify(exampleStateAction, null, 4);
     const stateActionTextareaEvent = new Event('input');
     exampleStateActionTextarea.dispatchEvent(stateActionTextareaEvent);
 }
@@ -167,10 +165,14 @@ function setValueFromPath(path, value) {
 function render() {
     if (renderFunction) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        requestAnimationFrame(() => renderFunction(ctx, exampleState, exampleAction));
-        renderFunction(ctx, exampleState, exampleAction);
+        requestAnimationFrame(() => renderFunction(ctx, exampleParameters, exampleStateAction.state, exampleStateAction.action));
+        renderFunction(ctx, exampleParameters, exampleStateAction.state, exampleStateAction.action);
     }
 }
+
+document.getElementById('exampleParameters').addEventListener('input', () => {
+    localStorage.setItem("example_parameters", document.getElementById('exampleParameters').value)
+});
 
 document.getElementById('exampleStateAction').addEventListener('input', () => {
     localStorage.setItem("example_state_action", document.getElementById('exampleStateAction').value)
@@ -189,6 +191,7 @@ function ctrl_enter_callback(event){
 } 
 
 document.getElementById('renderCode').addEventListener('keydown', ctrl_enter_callback);
+document.getElementById('exampleParameters').addEventListener('keydown', ctrl_enter_callback);
 document.getElementById('exampleStateAction').addEventListener('keydown', ctrl_enter_callback);
 document.getElementById('stateActionLimits').addEventListener('keydown', ctrl_enter_callback);
 
@@ -235,6 +238,9 @@ function stopResizing() {
 function resetButtonCallback(example){
     const confirmed = confirm(`Are you sure you want to load the ${example} example? This will overwrite your changes`)
     if (confirmed){
+        if(localStorage.getItem("example_parameters") != null){
+            localStorage.removeItem("example_parameters")
+        }
         if(localStorage.getItem("example_state_action") != null){
             localStorage.removeItem("example_state_action")
         }
@@ -249,7 +255,14 @@ function resetButtonCallback(example){
 }
 
 window.addEventListener('load', () => {
-    loadDefaults("pendulum-simple");
+    const urlParams = new URLSearchParams(window.location.search);
+    let default_environment = "pendulum-simple";
+    let forceReload = false;
+    if(urlParams.has('forceReload')){
+        default_environment = urlParams.get('forceReload')
+        forceReload = true;
+    }
+    loadDefaults(default_environment, forceReload);
     const updateButton = document.getElementById('updateButton');
     updateButton.addEventListener('click', updateRenderFunction);
     document.getElementById('resetButtonPendulumSimple').addEventListener('click', () => resetButtonCallback("pendulum-simple"));

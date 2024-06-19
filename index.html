@@ -22,6 +22,9 @@
                 <div id="resizeHandleInner" class="hidden"></div>
             </div>
         </div>
+        <h4>Define Example Parameters for Mocking</h4>
+        <div class="info-container"></div>
+        <textarea id="exampleParameters" placeholder="Define example parameters here..."></textarea>
         <h4>Define an Example State and Action for Mocking</h4>
         <div class="info-container">This is the state of your environment and should have the structure returned by the <code>rl_tools::json</code> function of your environment (<a href="https://github.com/rl-tools/rl-tools/blob/002e8237729a24bbc233a8232d7dd89416cc1aa9/include/rl_tools/rl/environments/pendulum/operations_cpu.h#L14">example</a>)</div>
         <textarea id="exampleStateAction" placeholder="Define example state and action here..."></textarea>
@@ -44,6 +47,8 @@
             </div>
         </div>
         </br>
+        <h4>Offline Usage</h4>
+        <div class="info-container">An alternative way to use this tool is to clone the repo <code>https://github.com/rl-tools/studio.rl.tools.git</code> and open the <code>index.html</code> with <code>python -m http.server</code> using the <code>?forceReload={environment-name}</code> options (e.g. <code>localhost:8000/?forceReload=my-environment</code>). Alternatively you can also e.g. use the Live Server VS Code plugin, which automatically reloads the page on changes to the environment. To define a new environment, create a new directory <code>examples/{environment-name}</code> with the same file structure as the other example environments.</div>
     </div>
 
     <script src="index.js" type="module"></script>

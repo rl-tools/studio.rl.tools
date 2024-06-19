@@ -1,0 +1,40 @@
+{
+    "state": {
+        "agent_states": [
+            {
+                "position": [
+                    5.2,
+                    4.3
+                ],
+                "orientation": 1.0048,
+                "velocity": [
+                    0.1,
+                    0.2
+                ],
+                "angular_velocity": 0.01
+            },
+            {
+                "position": [
+                    15,
+                    5
+                ],
+                "orientation": -0.5,
+                "velocity": [
+                    -0.1,
+                    -0.2
+                ],
+                "angular_velocity": -0.01
+            }
+        ]
+    },
+    "action": [
+        [
+            0.72,
+            -0.28
+        ],
+        [
+            -0.2,
+            -0.3
+        ]
+    ]
+}

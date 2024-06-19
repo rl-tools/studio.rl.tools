@@ -1,4 +1,4 @@
-function render(ctx, state, action) {
+function render(ctx, parameters, state, action) {
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
     const centerX = ctx.canvas.width / 2;
