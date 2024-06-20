@@ -256,7 +256,7 @@ function resetButtonCallback(example){
 
 window.addEventListener('load', () => {
     const urlParams = new URLSearchParams(window.location.search);
-    let default_environment = "pendulum-simple";
+    let default_environment = "acrobot";
     let forceReload = false;
     if(urlParams.has('forceReload')){
         default_environment = urlParams.get('forceReload')
