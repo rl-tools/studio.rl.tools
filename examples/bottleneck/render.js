@@ -66,6 +66,7 @@ function render(ctx, parameters, state, action) {
         const agent_action = action[i];
 
         // Linear acceleration in the direction of orientation
+        const accelerationArrowColor = '#dc143c';
         if(!agent.dead){
             const accelMagnitude = agent_action[0] * scaleX;
             const accelX = accelMagnitude * Math.cos(orientation);
@@ -73,7 +74,8 @@ function render(ctx, parameters, state, action) {
             ctx.beginPath();
             ctx.moveTo(posX, posY);
             ctx.lineTo(posX + accelX, posY + accelY);
-            ctx.strokeStyle = '#dc143c';
+
+            ctx.strokeStyle = accelerationArrowColor;
             ctx.lineWidth = 2/25*scaleX;
             ctx.stroke();
 
