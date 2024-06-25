@@ -5,7 +5,7 @@
     "LIDAR_RANGE": 3,
     "DT": 0.05,
     "ARENA_WIDTH": 20,
-    "ARENA_HEIGHT": 10,
+    "ARENA_HEIGHT": 20,
     "AGENT_DIAMETER": 1.5,
     "AGENT_MAX_SPEED": 2,
     "AGENT_MAX_ACCELERATION": 2,

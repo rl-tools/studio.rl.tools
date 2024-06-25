@@ -1,40 +1,126 @@
 {
+    "action": [
+        [
+            1,
+            -1
+        ],
+        [
+            1,
+            -1
+        ]
+    ],
     "state": {
         "agent_states": [
             {
+                "angular_velocity": 0.102,
+                "dead": 0,
+                "lidar": [
+                    {
+                        "distance": 14.235729,
+                        "intersects": 1,
+                        "point": [
+                            3.7857,
+                            0
+                        ]
+                    },
+                    {
+                        "distance": 13.816033,
+                        "intersects": 1,
+                        "point": [
+                            5.079148,
+                            0
+                        ]
+                    },
+                    {
+                        "distance": 13.520328,
+                        "intersects": 1,
+                        "point": [
+                            6.307595,
+                            0
+                        ]
+                    },
+                    {
+                        "distance": 13.336385,
+                        "intersects": 1,
+                        "point": [
+                            7.493394,
+                            0
+                        ]
+                    },
+                    {
+                        "distance": 13.256919,
+                        "intersects": 1,
+                        "point": [
+                            8.656092,
+                            0
+                        ]
+                    }
+                ],
+                "orientation": -1.77003,
                 "position": [
-                    5.2,
-                    4.3
+                    8.983518,
+                    13.252874
                 ],
-                "orientation": 1.0048,
                 "velocity": [
-                    0.1,
-                    0.2
-                ],
-                "angular_velocity": 0.01
+                    0.060437,
+                    -0.082167
+                ]
             },
             {
+                "angular_velocity": 0.102,
+                "dead": 0,
+                "lidar": [
+                    {
+                        "distance": 10.843097,
+                        "intersects": 1,
+                        "point": [
+                            3.491602,
+                            20
+                        ]
+                    },
+                    {
+                        "distance": 10.717389,
+                        "intersects": 1,
+                        "point": [
+                            2.542799,
+                            20
+                        ]
+                    },
+                    {
+                        "distance": 10.674875,
+                        "intersects": 1,
+                        "point": [
+                            1.608716,
+                            20
+                        ]
+                    },
+                    {
+                        "distance": 10.713915,
+                        "intersects": 1,
+                        "point": [
+                            0.674935,
+                            20
+                        ]
+                    },
+                    {
+                        "distance": 9.247506,
+                        "intersects": 1,
+                        "point": [
+                            0,
+                            18.43512
+                        ]
+                    }
+                ],
+                "orientation": 1.568943,
                 "position": [
-                    15,
-                    5
+                    1.588929,
+                    9.325143
                 ],
-                "orientation": -0.5,
                 "velocity": [
-                    -0.1,
-                    -0.2
-                ],
-                "angular_velocity": -0.01
+                    -0.075377,
+                    0.068719
+                ]
             }
         ]
-    },
-    "action": [
-        [
-            0.72,
-            -0.28
-        ],
-        [
-            -0.2,
-            -0.3
-        ]
-    ]
+    }
 }
