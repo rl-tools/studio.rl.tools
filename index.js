@@ -220,9 +220,10 @@ window.addEventListener('load', () => {
     const urlParams = new URLSearchParams(window.location.search);
     let default_environment = "acrobot";
     let forceReload = false;
-    if(urlParams.has('forceReload')){
-        default_environment = urlParams.get('forceReload')
+    if(urlParams.has('force')){
+        default_environment = urlParams.get('force')
         forceReload = true;
+        topSection.style.height = `80vh`;
     }
     loadDefaults(default_environment, forceReload);
     const updateButton = document.getElementById('updateButton');

@@ -63,17 +63,19 @@ function render(ctx, parameters, state, action) {
         ctx.stroke();
 
         // Draw actions (acceleration vectors)
-        const agent_action = action[i];
+        const agent_action = [action[i*2 + 0], action[i*2 + 1]].map(action => Math.max(-1, Math.min(1, action)));
 
         // Linear acceleration in the direction of orientation
         const accelerationArrowColor = '#dc143c';
         if(!agent.dead){
-            const accelMagnitude = agent_action[0] * scaleX;
+            const accelMagnitude = agent_action[0]/2 * agentRadius;
             const accelX = accelMagnitude * Math.cos(orientation);
             const accelY = accelMagnitude * Math.sin(orientation);
+            const offsetX = posX + agentRadius * 0.5 * Math.cos(orientation);
+            const offsetY = posY + agentRadius * 0.5 * Math.sin(orientation);
             ctx.beginPath();
-            ctx.moveTo(posX, posY);
-            ctx.lineTo(posX + accelX, posY + accelY);
+            ctx.moveTo(offsetX, offsetY);
+            ctx.lineTo(offsetX + accelX, offsetY + accelY);
 
             ctx.strokeStyle = accelerationArrowColor;
             ctx.lineWidth = 2/25*scaleX;
@@ -81,19 +83,20 @@ function render(ctx, parameters, state, action) {
 
             // Draw arrowhead for linear acceleration
             const angle = Math.atan2(accelY, accelX);
-            const headlen = 0.7 * Math.min(0.5, Math.abs(agent_action[0])) * scaleX;
+            const headlen = 0.5 * Math.min(0.5, Math.abs(agent_action[0])) * scaleX;
             ctx.beginPath();
-            ctx.moveTo(posX + accelX, posY + accelY);
-            ctx.lineTo(posX + accelX - headlen * Math.cos(angle - Math.PI / 6), posY + accelY - headlen * Math.sin(angle - Math.PI / 6));
-            ctx.moveTo(posX + accelX, posY + accelY);
-            ctx.lineTo(posX + accelX - headlen * Math.cos(angle + Math.PI / 6), posY + accelY - headlen * Math.sin(angle + Math.PI / 6));
-            ctx.lineWidth = 2/25*scaleX;
+            const prolong = 1.1
+            ctx.moveTo(offsetX + accelX*prolong, offsetY + accelY*prolong);
+            ctx.lineTo(offsetX + accelX*prolong - headlen * Math.cos(angle - Math.PI / 6), offsetY + accelY*prolong - headlen * Math.sin(angle - Math.PI / 6));
+            ctx.moveTo(offsetX + accelX*prolong, offsetY + accelY*prolong);
+            ctx.lineTo(offsetX + accelX*prolong - headlen * Math.cos(angle + Math.PI / 6), offsetY + accelY*prolong - headlen * Math.sin(angle + Math.PI / 6));
+            ctx.lineWidth = 1/25*scaleX;
             ctx.stroke();
         }
 
         // Draw circular arrow for angular acceleration
         if(!agent.dead){
-            const angularAccel = Math.max(-1, Math.min(1, agent_action[1])); // Negative sign to match the canvas coordinate system
+            const angularAccel = agent_action[1]; // Negative sign to match the canvas coordinate system
             const direction = Math.sign(angularAccel);
             const arrowRadius = agentRadius * 1.5;
             const arrowAngle = Math.PI / 3;
@@ -128,6 +131,33 @@ function render(ctx, parameters, state, action) {
             ctx.lineWidth = 2/25*scaleX;
             ctx.stroke();
         }
+
+        // Draw the agent ID
+        const labelPosX = posX - agentRadius / 2 * Math.cos(orientation);
+        const labelPosY = posY - agentRadius / 2 * Math.sin(orientation);
+        ctx.save();
+        ctx.translate(labelPosX, labelPosY);
+        ctx.rotate(orientation + Math.PI / 2);
+        const agentID = i.toString();
+        const fontSize = 0.5 * agentRadius;
+        ctx.font = `${fontSize}px Arial`;
+        const textMetrics = ctx.measureText(agentID);
+        const textWidth = textMetrics.width;
+        const textHeight = fontSize;
+        const circleRadius = Math.max(textWidth, textHeight) * 0.70;
+        ctx.beginPath();
+        ctx.arc(0, 0, circleRadius, 0, 2 * Math.PI);
+        ctx.fillStyle = 'white';
+        ctx.fill();
+        ctx.strokeStyle = 'black';
+        ctx.lineWidth = 0.5/25*scaleX;
+        ctx.stroke();
+        ctx.fillStyle = 'black';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        const textYOffset = fontSize * 0.1;
+        ctx.fillText(agentID, 0, textYOffset);
+        ctx.restore();
     }
 }
 
