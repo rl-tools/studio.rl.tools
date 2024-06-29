@@ -1,4 +1,5 @@
 
+
 window.addEventListener('load', () => {
     let renderFunction;
     let exampleStateAction;
@@ -10,6 +11,48 @@ window.addEventListener('load', () => {
     const overlayToggle = document.getElementById('overlayToggle');
     const resizeHandle = document.getElementById('resizeHandle');
     const resizeHandleInner = document.getElementById('resizeHandleInner');
+
+    function resizeEditor(editorContainer, editor){
+        const rowHeight = editor.renderer.lineHeight || 20;
+        const numberOfRows = Math.max(3, editor.session.getLength());
+        const newHeight = numberOfRows * rowHeight;
+        editorContainer.style.height = `${newHeight}px`;
+        editor.resize();
+    }
+
+    function makeEditor(element){
+        return ace.edit(element, {
+            mode: "ace/mode/javascript",
+            selectionStyle: "text",
+            theme: "ace/theme/tomorrow"
+        })
+    }
+
+    const vimBindingsToggle = document.getElementById('vimBindingsToggle');
+
+    const exampleParametersEditorContainer = document.getElementById('exampleParameters')
+    const exampleParametersEditor = makeEditor(exampleParametersEditorContainer);
+    const exampleStateActionEditorContainer = document.getElementById('exampleStateAction')
+    const exampleStateActionEditor = makeEditor(exampleStateActionEditorContainer);
+    const stateActionLimitsEditorContainer = document.getElementById('stateActionLimits')
+    const stateActionLimitsEditor = makeEditor(stateActionLimitsEditorContainer);
+    const renderCodeEditorContainer = document.getElementById('renderCode')
+    const renderCodeEditor = makeEditor(renderCodeEditorContainer);
+
+    function toggleVimBindings(state){
+        for(const editor of [exampleParametersEditor, exampleStateActionEditor, stateActionLimitsEditor, renderCodeEditor]){
+            editor.setKeyboardHandler(state ? 'ace/keyboard/vim' : '');
+        }
+    }
+    vimBindingsToggle.addEventListener('change', (event) => {
+        localStorage.setItem("vim_bindings", event.target.checked)
+        toggleVimBindings(event.target.checked)
+    });
+    const vimBindingsEnabled = localStorage.getItem("vim_bindings") != null ? localStorage.getItem("vim_bindings") === "true" : false;
+    vimBindingsToggle.checked = vimBindingsEnabled;
+    toggleVimBindings(vimBindingsEnabled);
+
+    
 
     async function loadDefaults(example, forceReload) {
         try {
@@ -23,27 +66,24 @@ window.addEventListener('load', () => {
             }
 
             exampleParameters = localStorage.getItem("example_parameters") != null && !forceReload ? localStorage.getItem("example_parameters") : await exampleParametersResponse.text();
-            const exampleParametersTextarea = document.getElementById('exampleParameters')
-            exampleParametersTextarea.value = exampleParameters;
-            exampleParametersTextarea.rows = exampleParameters.split('\n').length;
+            exampleParametersEditor.setValue(exampleParameters, -1);
+            resizeEditor(exampleParametersEditorContainer, exampleParametersEditor)
             localStorage.setItem("example_parameters", exampleParameters)
 
             exampleStateAction = localStorage.getItem("example_state_action") != null && !forceReload ? localStorage.getItem("example_state_action") : await exampleStateActionResponse.text();
-            const exampleStateActionTextarea = document.getElementById('exampleStateAction')
-            exampleStateActionTextarea.value = exampleStateAction;
-            exampleStateActionTextarea.rows = exampleStateAction.split('\n').length;
+            exampleStateActionEditor.setValue(exampleStateAction, -1);
+            resizeEditor(exampleStateActionEditorContainer, exampleStateActionEditor)
             localStorage.setItem("example_state_action", exampleStateAction)
 
-            const renderCode = localStorage.getItem("render") != null && !forceReload ? localStorage.getItem("render") : await renderResponse.text();
-            const renderCodeTextarea = document.getElementById('renderCode')
-            renderCodeTextarea.value = renderCode;
-            renderCodeTextarea.rows = renderCode.split('\n').length;
-
             const stateActionLimits = localStorage.getItem("limits_state_action") != null && !forceReload ? localStorage.getItem("limits_state_action") : await limitsResponse.text();
-            const stateActionLimitsTextarea = document.getElementById('stateActionLimits')
-            stateActionLimitsTextarea.value = stateActionLimits;
-            stateActionLimitsTextarea.rows = stateActionLimits.split('\n').length;
+            stateActionLimitsEditor.setValue(stateActionLimits, -1);
+            resizeEditor(stateActionLimitsEditorContainer, stateActionLimitsEditor)
             localStorage.setItem("limits_state_action", stateActionLimits)
+
+            const renderCode = localStorage.getItem("render") != null && !forceReload ? localStorage.getItem("render") : await renderResponse.text();
+            renderCodeEditor.setValue(renderCode, -1);
+            resizeEditor(renderCodeEditorContainer, renderCodeEditor)
+
 
             setTimeout(updateRenderFunction, 100);
         } catch (error) {
@@ -53,14 +93,14 @@ window.addEventListener('load', () => {
 
     function updateRenderFunction() {
         try {
-            exampleParameters = JSON.parse(document.getElementById('exampleParameters').value);
+            exampleParameters = JSON.parse(exampleParametersEditor.getValue());
         }
         catch (error) {
             alert(`Error parsing example parameters:\n${error.message}\nYou might want to reset to default values (button at the bottom of the page).`);
             return
         }
         try {
-            exampleStateAction = JSON.parse(document.getElementById('exampleStateAction').value);
+            exampleStateAction = JSON.parse(exampleStateActionEditor.getValue());
         }
         catch (error) {
             alert(`Error parsing example state and action:\n${error.message}\nYou might want to reset to default values (button at the bottom of the page).`);
@@ -68,14 +108,14 @@ window.addEventListener('load', () => {
         }
 
         try {
-            stateActionLimits = parseLimits(document.getElementById('stateActionLimits').value)
+            stateActionLimits = parseLimits(stateActionLimitsEditor.getValue())
             createSliders(stateActionLimits, render)
         }
         catch (error) {
             alert(`Error parsing state and action limits:\n${error}\nYou might want to reset to default values (button at the bottom of the page).`)
             return
         }
-        const renderCode = document.getElementById('renderCode').value;
+        const renderCode = renderCodeEditor.getValue();
         localStorage.setItem("render", renderCode)
         try {
             let functionBody = renderCode.substring(renderCode.indexOf("{") + 1, renderCode.lastIndexOf("}"));
@@ -157,10 +197,9 @@ window.addEventListener('load', () => {
             } else {
                 target[finalKey] = value;
             }
-        const exampleStateActionTextarea = document.getElementById('exampleStateAction')
-        exampleStateActionTextarea.value = JSON.stringify(exampleStateAction, null, 4);
+        exampleStateActionEditor.setValue(JSON.stringify(exampleStateAction, null, 4), -1);
         const stateActionTextareaEvent = new Event('input');
-        exampleStateActionTextarea.dispatchEvent(stateActionTextareaEvent);
+        exampleStateActionEditorContainer.dispatchEvent(stateActionTextareaEvent);
     }
 
     function render() {
@@ -172,15 +211,15 @@ window.addEventListener('load', () => {
     }
 
     document.getElementById('exampleParameters').addEventListener('input', () => {
-        localStorage.setItem("example_parameters", document.getElementById('exampleParameters').value)
+        localStorage.setItem("example_parameters", exampleParametersEditor.getValue())
     });
 
     document.getElementById('exampleStateAction').addEventListener('input', () => {
-        localStorage.setItem("example_state_action", document.getElementById('exampleStateAction').value)
+        localStorage.setItem("example_state_action", exampleStateActionEditor.getValue())
     });
 
     document.getElementById('stateActionLimits').addEventListener('input', () => {
-        localStorage.setItem("limits_state_action", document.getElementById('stateActionLimits').value)
+        localStorage.setItem("limits_state_action", stateActionLimitsEditor.getValue())
     });
 
 
