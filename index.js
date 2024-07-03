@@ -385,7 +385,7 @@ window.addEventListener('load', () => {
 
 
     function resizeOverlay(event) {
-        const newWidth = event.clientX - 15;
+        const newWidth = event.clientX - 25;
         stickyColumn.style.width = `${newWidth}px`;
     }
 

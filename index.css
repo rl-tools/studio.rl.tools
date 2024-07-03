@@ -20,7 +20,8 @@ body {
 
 .main-page-container{
     flex: 1 1 auto;
-    padding: 10px;
+    padding: 20px;
+    padding-left: 0px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -30,7 +31,8 @@ body {
     font-family: "Open Sans", sans-serif;
     padding: 10px 15px;
     border: none;
-    border-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
     background: #fff;
     color: #000000;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
@@ -130,8 +132,11 @@ button {
 
 .button-container {
     display: flex;
+    box-sizing: border-box;
     justify-content: space-between;
     margin-top: 20px;
+    padding-left: 30px;
+    padding-right: 30px;
 }
 
 #updateButton {
@@ -235,8 +240,11 @@ button {
 
 
 .info-container{
+    box-sizing: border-box;
     width: 100%;
     margin-bottom: 15px;
+    padding-left: 30px;
+    padding-right: 30px;
 }
 
 
