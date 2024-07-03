@@ -7,8 +7,8 @@ window.addEventListener('load', () => {
     let stateActionLimits;
     let renderLoop = {id: 0};
     let renderLoopsRunning = {};
-    const topSection = document.getElementById('topSection');
-    const overlayToggle = document.getElementById('overlayToggle');
+    const stickyColumn = document.getElementById('stickyColumn');
+    const stickyContainer = document.getElementById('stickyContainer');
     const resizeHandle = document.getElementById('resizeHandle');
     const resizeHandleInner = document.getElementById('resizeHandleInner');
     const canvas_container = document.querySelector('.canvas-container');
@@ -59,7 +59,7 @@ window.addEventListener('load', () => {
 
     const resizeCanvas = () => {
         const canvas = canvas_container.querySelector('canvas');
-        const size = Math.min(canvas_container.clientWidth, canvas_container.clientHeight);
+        const size = canvas_container.clientWidth; //Math.min(canvas_container.clientWidth, canvas_container.clientHeight);
         canvas.width = size * ratio;
         canvas.height = size * ratio;
 
@@ -80,7 +80,6 @@ window.addEventListener('load', () => {
     });
     window.addEventListener('resize', onResize);
     resizeObserver.observe(canvas_container);
-
     
 
     async function loadDefaults(example, forceReload) {
@@ -376,24 +375,6 @@ window.addEventListener('load', () => {
     document.getElementById('resetButtonQuadrotor').addEventListener('click', () => resetButtonCallback("l2f"));
 
 
-    function overlayToggleCallback(checked){
-        if (checked) {
-            topSection.classList.add('sticky');
-            resizeHandle.classList.remove('hidden');
-            resizeHandleInner.classList.remove('hidden');
-        } else {
-            topSection.classList.remove('sticky');
-            resizeHandle.classList.add('hidden');
-            resizeHandleInner.classList.add('hidden');
-        }
-    }
-
-    overlayToggleCallback(overlayToggle.checked);
-
-    overlayToggle.addEventListener('change', (event) => {
-        overlayToggleCallback(event.target.checked)
-    });
-
     resizeHandle.addEventListener('mousedown', (event) => {
         event.preventDefault();
         document.addEventListener('mousemove', resizeOverlay);
@@ -404,9 +385,8 @@ window.addEventListener('load', () => {
 
 
     function resizeOverlay(event) {
-        const newHeight = event.clientY - topSection.getBoundingClientRect().top - 20; // -20 for the padding
-        topSection.style.height = `${newHeight}px`;
-        // canvas_container.style.width = canvas_container.clientHeight;
+        const newWidth = event.clientX - 15;
+        stickyColumn.style.width = `${newWidth}px`;
     }
 
     function stopResizing() {

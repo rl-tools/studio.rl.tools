@@ -3,6 +3,8 @@ label {
 }
 body {
     font-family: "Open Sans", sans-serif;
+    padding: 0;
+    margin: 0;
 }
 
 .container {
@@ -10,6 +12,18 @@ body {
     flex-direction: column;
     align-items: center;
     margin-top: 20px;
+}
+.left-right-container{
+    display: flex;
+    min-height: 100vh;
+}
+
+.main-page-container{
+    flex: 1 1 auto;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .editor-container {
@@ -22,34 +36,54 @@ body {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     transition: all 0.2s ease-in-out;
     outline: none;
-    width: 900px;
+    width: 100%;
     resize: vertical;
+    box-sizing: border-box;
 }
 
 textarea:focus {
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); /* Slightly larger shadow on focus for a subtle effect */
 }
-.top-section {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    width: 100%;
-    height: 30vh;
-    position: relative;
-    padding-top: 10px;
-    padding-bottom: 20px;
-}
-.sliders {
+.sticky-column {
+    flex: 0 0 auto;
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
-    margin-right: 20px;
+    /* justify-content: center; */
+    align-items: flex-start;
+    /* width: 100%; */
+    /* height: 30vh; */
+    width: 300px;
+    position: relative;
+    padding: 10px;
+}
+.resize-column{
+    width: 20px;
+    position: sticky;
+    height: 100vh;
+    top: 0;
+}
+.sticky-container {
+    width: 100%;
+    position: sticky;
+    top: 10px;
+    max-height: calc(100vh - 20px);
+    display: flex;
+    flex-direction: column;
+}
+.sliders {
+    flex: 1;
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     overflow-y: auto;
     max-height: 100%;
     flex-shrink: 0;
+    width: 100%;
 }
 .canvas-container {
-    height: 100%;
+    /* height: 100%; */
+    width: 100%;
     aspect-ratio: 1 / 1;
 }
 .canvas-container > canvas {
@@ -60,7 +94,6 @@ textarea:focus {
     top: 0;
     z-index: 10;
     background: white;
-    width: 100%;
 }
 .hidden {
     display: none;
@@ -69,8 +102,8 @@ button {
     margin-bottom: 200px;
 }
 #resizeHandle {
-    width: 100%;
-    height: 15px;
+    width: 15px;
+    height: 100vh;
     background: repeating-linear-gradient(
         45deg,
         #ccc,
@@ -78,21 +111,19 @@ button {
         #ddd 10px,
         #ddd 20px
     );
-    cursor: ns-resize;
-    position: absolute;
-    bottom: 0;
-    left: 0;
+    cursor: ew-resize;
+    position: sticky;
+    top: 0;
 }
 #resizeHandleInner {
-    width: 50px;
-    height: 6px;
+    width: 6px;
+    height: 50px;
     background: #ffffff;
     border-radius: 3px;
-    cursor: ns-resize;
+    cursor: ew-resize;
     position: absolute;
-    bottom: 4.5px;
-    left: 50%;
-    transform: translateX(-50%);
+    bottom: 50%;
+    right: 4.5px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
@@ -127,15 +158,17 @@ button {
 /* existing styles */
 
 .button-container {
-    width: 900px;
+    width: 100%;
     display: flex;
     /* justify-content: left; */
     align-items: center;
     margin-top: 10px;
+    flex-wrap: wrap;
 }
 
 .left-buttons {
     display: flex;
+    flex-wrap: wrap;
 }
 .left-buttons input {
     margin-right: 10px; 
@@ -202,7 +235,7 @@ button {
 
 
 .info-container{
-    width: 900px;
+    width: 100%;
     margin-bottom: 15px;
 }
 
