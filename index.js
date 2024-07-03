@@ -123,7 +123,7 @@ window.addEventListener('load', () => {
         }
     }
 
-    function updateRenderFunction() {
+    async function updateRenderFunction() {
         try {
             exampleParameters = JSON.parse(exampleParametersEditor.getValue());
         }
@@ -151,8 +151,11 @@ window.addEventListener('load', () => {
         localStorage.setItem("init", initCode)
 
         try {
-            const functionBody = initCode.substring(initCode.indexOf("{") + 1, initCode.lastIndexOf("}"));
-            initFunction = new Function('package_index', 'canvas', functionBody);
+            const blob = new Blob([initCode], { type: 'text/javascript' });
+            const url = URL.createObjectURL(blob);
+            const module = await import(url);
+            initFunction  = module.init
+            URL.revokeObjectURL(url);
             ui_state = null
         }
         catch (error) {
@@ -163,8 +166,12 @@ window.addEventListener('load', () => {
         const renderCode = renderCodeEditor.getValue();
         localStorage.setItem("render", renderCode)
         try {
-            let functionBody = renderCode.substring(renderCode.indexOf("{") + 1, renderCode.lastIndexOf("}"));
-            renderFunction = new Function('ui_state', 'parameters', 'state', 'action', functionBody);
+            const blob = new Blob([renderCode], { type: 'text/javascript' });
+            const url = URL.createObjectURL(blob);
+            const module = await import(url);
+            renderFunction  = module.render
+            URL.revokeObjectURL(url);
+            // renderFunction = new Function('ui_state', 'parameters', 'state', 'action', functionBody);
             render();
         }
         catch (error) {
