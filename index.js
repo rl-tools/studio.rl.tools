@@ -263,7 +263,7 @@ window.addEventListener('load', () => {
             canvas.height = 500;
             canvas_container.appendChild(canvas);
             resizeCanvas()
-            ui_state = await initFunction(canvas, ratio);
+            ui_state = await initFunction(canvas, exampleParameters, {devicePixelRatio: ratio});
         }
     }
 
@@ -274,6 +274,7 @@ window.addEventListener('load', () => {
             }
             if(ui_state){
 
+                renderLoop.id += 1;
                 const current_id = renderLoop.id;
                 const loop = () => {
                     if(renderLoop.id === current_id){
@@ -281,7 +282,7 @@ window.addEventListener('load', () => {
                         requestAnimationFrame(loop);
                     }
                     else{
-                        console.log("Terminating render loop: ", current_id)
+                        // console.log("Terminating render loop: ", current_id)
                     }
                 }
                 requestAnimationFrame(loop)

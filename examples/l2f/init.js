@@ -165,8 +165,8 @@ let default_model = {
 
 
 
-class L2FState{
-    constructor(canvas, devicePixelRatio){
+class State{
+    constructor(canvas, parameters, {devicePixelRatio}){
         this.canvas = canvas
         this.devicePixelRatio = devicePixelRatio
     }
@@ -209,9 +209,9 @@ class L2FState{
         directionalLight.target.position.set(0, 0, 0)
         this.scene.add( directionalLight )
 
-        this.camera.position.set(3.3, 1.4, 0.03)
+        this.camera.position.set(3.3, 1.4, 0.00)
         this.camera.quaternion.set(-0.14, 0.70, 0.14, 0.68)
-        this.controls.target.set(0.0005264957437930768, 0.017380732981683286, 0.09835959876765327)
+        this.controls.target.set(0.0, 0.0, 0.0)
         this.controls.update()
     }
 
@@ -359,8 +359,8 @@ const example_state = {
     { "rpm": 0 }
   ] 
 }
-export async function init(canvas, devicePixelRatio){
-    const state = new L2FState(canvas, devicePixelRatio)
+export async function init(canvas, parameters, options){
+    const state = new State(canvas, parameters, options)
     await state.initialize()
     const drone = new Drone(default_model)
     state.simulator.add(drone.get())
