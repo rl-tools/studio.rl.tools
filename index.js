@@ -373,6 +373,7 @@ window.addEventListener('load', () => {
     document.getElementById('resetButtonPendulum').addEventListener('click', () => resetButtonCallback("pendulum"));
     document.getElementById('resetButtonAcrobot').addEventListener('click', () => resetButtonCallback("acrobot"));
     document.getElementById('resetButton3D').addEventListener('click', () => resetButtonCallback("3d"));
+    document.getElementById('resetButtonQuadrotor').addEventListener('click', () => resetButtonCallback("l2f"));
 
 
     function overlayToggleCallback(checked){
