@@ -6,6 +6,7 @@ window.addEventListener('load', () => {
     let exampleParameters;
     let stateActionLimits;
     let renderLoop = {id: 0};
+    let renderLoopsRunning = {};
     const topSection = document.getElementById('topSection');
     const overlayToggle = document.getElementById('overlayToggle');
     const resizeHandle = document.getElementById('resizeHandle');
@@ -276,13 +277,14 @@ window.addEventListener('load', () => {
 
                 renderLoop.id += 1;
                 const current_id = renderLoop.id;
+                renderLoopsRunning[current_id] = true;
                 const loop = () => {
                     if(renderLoop.id === current_id){
                         renderFunction(ui_state, exampleParameters, exampleStateAction.state, exampleStateAction.action)
                         requestAnimationFrame(loop);
                     }
                     else{
-                        // console.log("Terminating render loop: ", current_id)
+                        delete renderLoopsRunning[current_id];
                     }
                 }
                 requestAnimationFrame(loop)
@@ -320,8 +322,16 @@ window.addEventListener('load', () => {
 
 
 
-    function resetButtonCallback(example){
+    async function resetButtonCallback(example){
         const confirmed = confirm(`Are you sure you want to load the ${example} example? This will overwrite your changes`)
+        renderLoop.id += 1;
+        await new Promise((resolve) => {
+            setInterval(() => {
+                if(Object.keys(renderLoopsRunning).length === 0){
+                    resolve();
+                }
+            })
+        })
         if (confirmed){
             if(localStorage.getItem("example_parameters") != null){
                 localStorage.removeItem("example_parameters")
@@ -331,6 +341,9 @@ window.addEventListener('load', () => {
             }
             if(localStorage.getItem("limits_state_action") != null){
                 localStorage.removeItem("limits_state_action")
+            }
+            if(localStorage.getItem("init") != null){
+                localStorage.removeItem("init")
             }
             if(localStorage.getItem("render") != null){
                 localStorage.removeItem("render")
@@ -356,9 +369,10 @@ window.addEventListener('load', () => {
     loadDefaults(default_environment, forceReload);
     const updateButton = document.getElementById('updateButton');
     updateButton.addEventListener('click', updateRenderFunction);
-    document.getElementById('resetButtonPendulumSimple').addEventListener('click', () => resetButtonCallback("pendulum-simple"));
+    // document.getElementById('resetButtonPendulumSimple').addEventListener('click', () => resetButtonCallback("pendulum-simple"));
     document.getElementById('resetButtonPendulum').addEventListener('click', () => resetButtonCallback("pendulum"));
     document.getElementById('resetButtonAcrobot').addEventListener('click', () => resetButtonCallback("acrobot"));
+    document.getElementById('resetButton3D').addEventListener('click', () => resetButtonCallback("3d"));
 
 
     function overlayToggleCallback(checked){
