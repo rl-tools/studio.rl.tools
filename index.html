@@ -36,9 +36,17 @@
             </div>
         </div>
         <div class="main-page-container">
+            <h2>Examples</h2>
+            <div class="left-buttons">
+                <!-- <input type="button" id="resetButtonPendulumSimple" class="fancy-button fancy-button-small fancy-button-grey" value="Pendulum (simple)"> -->
+                <input type="button" id="resetButtonPendulum" class="fancy-button fancy-button-small fancy-button" value="Pendulum">
+                <input type="button" id="resetButtonAcrobot" class="fancy-button fancy-button-small fancy-button" value="Acrobot">
+                <input type="button" id="resetButton3D" class="fancy-button fancy-button-small fancy-button" value="3D">
+                <input type="button" id="resetButtonQuadrotor" class="fancy-button fancy-button-small fancy-button" value="Quadrotor">
+            </div>
             <label class="form-switch vim-switch"><input id="vimBindingsToggle" type="checkbox"><i></i><span>VIM Bindings</span></label>
             <h4>Define Example Parameters for Mocking</h4>
-            <div class="info-container"></div>
+            <div class="info-container">Parameters govern the appearance and/or dynamcis of the environment. In RLtools it is a convention that parameters do not change during the episode (intra-episode dynamics are captured by the state). Parameters can be sampled at the beginning of an episode to e.g. implement domain randomization. In this UI builder we just provide one set of example parameters for mocking:</div>
             <div class="editor-container">
                 <div id="exampleParameters" class="editor">Define example parameters here...</div>
             </div>
@@ -65,13 +73,6 @@
             </div>
             </br>
             <div class="button-container">
-                <div class="left-buttons">
-                    <!-- <input type="button" id="resetButtonPendulumSimple" class="fancy-button fancy-button-small fancy-button-grey" value="Pendulum (simple)"> -->
-                    <input type="button" id="resetButtonPendulum" class="fancy-button fancy-button-small fancy-button-grey" value="Pendulum">
-                    <input type="button" id="resetButtonAcrobot" class="fancy-button fancy-button-small fancy-button-grey" value="Acrobot">
-                    <input type="button" id="resetButton3D" class="fancy-button fancy-button-small fancy-button-grey" value="3D">
-                    <input type="button" id="resetButtonQuadrotor" class="fancy-button fancy-button-small fancy-button-grey" value="Quadrotor">
-                </div>
                 <div class="center-filler"></div>
                 <div class="right-button">
                     <input type="button" id="updateButton" class="fancy-button" value="Update [ctrl+enter]">
