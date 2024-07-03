@@ -318,7 +318,7 @@ code {
 
 .form-switch input { display: none; }
 
-.form-switch input:checked + i { background-color: #4BD763; }
+.form-switch input:checked + i { background-color: #67b1ae; }
 
 .form-switch input:checked + i::before { transform: translate3d(18px, 2px, 0) scale3d(0, 0, 0); }
 
