@@ -1,5 +1,3 @@
-
-
 window.addEventListener('load', () => {
     let initFunction;
     let renderFunction;
@@ -7,7 +5,7 @@ window.addEventListener('load', () => {
     let exampleStateAction;
     let exampleParameters;
     let stateActionLimits;
-    const package_index = {};
+    let renderLoop = {id: 0};
     const topSection = document.getElementById('topSection');
     const overlayToggle = document.getElementById('overlayToggle');
     const resizeHandle = document.getElementById('resizeHandle');
@@ -58,7 +56,7 @@ window.addEventListener('load', () => {
     vimBindingsToggle.checked = vimBindingsEnabled;
     toggleVimBindings(vimBindingsEnabled);
 
-    const onResize = () => {
+    const resizeCanvas = () => {
         const canvas = canvas_container.querySelector('canvas');
         const size = Math.min(canvas_container.clientWidth, canvas_container.clientHeight);
         canvas.width = size * ratio;
@@ -66,6 +64,9 @@ window.addEventListener('load', () => {
 
         canvas.style.width = size + 'px';
         canvas.style.height = size + 'px';
+    }
+    const onResize = () => {
+        resizeCanvas()
         render()
     }
     onResize();
@@ -159,7 +160,7 @@ window.addEventListener('load', () => {
             ui_state = null
         }
         catch (error) {
-            alert(`Error parsing the render function:\n${error.message}\nYou might want to reset to default values (button at the bottom of the page).`)
+            alert(`Error parsing the init function:\n${error.message}\nYou might want to reset to default values (button at the bottom of the page).`)
             return
         }
 
@@ -171,7 +172,6 @@ window.addEventListener('load', () => {
             const module = await import(url);
             renderFunction  = module.render
             URL.revokeObjectURL(url);
-            // renderFunction = new Function('ui_state', 'parameters', 'state', 'action', functionBody);
             render();
         }
         catch (error) {
@@ -254,25 +254,37 @@ window.addEventListener('load', () => {
         exampleStateActionEditorContainer.dispatchEvent(stateActionTextareaEvent);
     }
 
-    function init() {
+    async function init() {
         if (initFunction) {
             console.log("UI Init")
             canvas_container.innerHTML = '';
             const canvas = document.createElement('canvas');
+            canvas.width = 500;
+            canvas.height = 500;
             canvas_container.appendChild(canvas);
-            ui_state = initFunction(package_index, canvas);
-            onResize()
+            resizeCanvas()
+            ui_state = await initFunction(canvas, ratio);
         }
     }
 
-    function render() {
+    async function render() {
         if (initFunction && renderFunction){
             if(!ui_state){
-                init()
+                await init()
             }
             if(ui_state){
-                requestAnimationFrame(() => renderFunction(ui_state, exampleParameters, exampleStateAction.state, exampleStateAction.action));
-                // renderFunction(ui_state, exampleParameters, exampleStateAction.state, exampleStateAction.action);
+
+                const current_id = renderLoop.id;
+                const loop = () => {
+                    if(renderLoop.id === current_id){
+                        renderFunction(ui_state, exampleParameters, exampleStateAction.state, exampleStateAction.action)
+                        requestAnimationFrame(loop);
+                    }
+                    else{
+                        console.log("Terminating render loop: ", current_id)
+                    }
+                }
+                requestAnimationFrame(loop)
             }
             else{
                 throw new Error('init function not successfull')
