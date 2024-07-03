@@ -1,5 +1,7 @@
+import * as THREE from "three"
 export async function render(ui_state, parameters, state, action) {
     ui_state.box.position.set(state.position.x, state.position.y, state.position.z)
+    ui_state.box.quaternion.copy(new THREE.Quaternion(state.orientation.x, state.orientation.y, state.orientation.z, state.orientation.w).normalize())
     const width = ui_state.canvas.width
     const height = ui_state.canvas.height
     ui_state.camera.aspect =  width / height
