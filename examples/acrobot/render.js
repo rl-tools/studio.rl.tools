@@ -6,10 +6,10 @@ export function render(ui_state, parameters, state, action) {
     const centerY = ctx.canvas.height / 2;
     const canvasWidth = ctx.canvas.width;
 
-    const pendulumLength1 = canvasWidth * 0.2;
-    const pendulumLength2 = canvasWidth * 0.2;
-    const bobRadius = canvasWidth * 0.02; 
-    const pivotRadius = canvasWidth * 0.01;
+    const pendulumLength1 = canvasWidth * parameters.PENDULUM_LENGTH_1;
+    const pendulumLength2 = canvasWidth * parameters.PENDULUM_LENGTH_2;
+    const bobRadius = canvasWidth * parameters.BOB_RADIUS; 
+    const pivotRadius = canvasWidth * parameters.PIVOT_RADIUS;
 
     // First pendulum (base to joint)
     const pendulumX1 = centerX + pendulumLength1 * Math.sin(state.theta1);
@@ -18,7 +18,7 @@ export function render(ui_state, parameters, state, action) {
     ctx.beginPath();
     ctx.moveTo(centerX, centerY);
     ctx.lineTo(pendulumX1, pendulumY1);
-    ctx.lineWidth = canvasWidth * 0.008;
+    ctx.lineWidth = canvasWidth * parameters.ROD_WIDTH;
     ctx.strokeStyle = 'black';
     ctx.stroke();
 
@@ -35,10 +35,11 @@ export function render(ui_state, parameters, state, action) {
     ctx.beginPath();
     ctx.moveTo(pendulumX1, pendulumY1);
     ctx.lineTo(pendulumX2, pendulumY2);
-    ctx.lineWidth = canvasWidth * 0.008;
+    ctx.lineWidth = canvasWidth * parameters.ROD_WIDTH;
     ctx.strokeStyle = 'black';
     ctx.stroke();
 
+    ctx.lineWidth = 0.008 * canvasWidth
     ctx.beginPath();
     ctx.arc(pendulumX1, pendulumY1, pivotRadius, 0, 2 * Math.PI);
     ctx.fillStyle = 'black';
