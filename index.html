@@ -17,7 +17,7 @@
         <div id="topSection" class="top-section">
             <div class="sliders" id="sliders"></div>
             <div id="canvas-container" class="canvas-container">
-                <canvas id="canvas" width="500" height="500"></canvas>
+                <canvas width="500" height="500"></canvas>
             </div>
             <div id="resizeHandle" class="hidden">
                 <div id="resizeHandleInner" class="hidden"></div>
@@ -35,19 +35,21 @@
         <div class="editor-container">
             <div id="exampleStateAction" class="editor">Define example state and action here...</div>
         </div>
-        <!-- <textarea id="exampleStateAction" placeholder=></textarea> -->
         <h4>Define Limits for Parts of the Example State and Action</h4>
         <div class="info-container">For each of the defined limits a slider will be created for interactive mocking</div>
         <div class="editor-container">
             <div id="stateActionLimits" class="editor">Define limits for state and action here...</div>
         </div>
-        <!-- <textarea id="stateActionLimits" placeholder="Define limits for state and action here..."></textarea> -->
+        <h4>Define the Init Function for the Environment</h4>
+        <div class="info-container">The canvas is a <a href="https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API">HTML5 Canvas</a> which exposes a simple and stable API for drawing 2D and 3D content in web-browsers. Here you can do a one-time setup of the <code>ui_state</code> which then gets passed into the <code>render</code> subsequently.</div>
+        <div class="editor-container">
+            <div id="initCode" class="editor">Write your <code>init(canvas) => ui_state</code> function here...</div>
+        </div>
         <h4>Define the Rendering Function for the Environment</h4>
-        <div class="info-container">The context is a <a href="https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D">CanvasRenderingContext2D</a> which exposes a simple and stable (HTML5) API for drawing 2D content in web-browsers.</div>
+        <div class="info-container">This function shall render the UI based on the parameters, state and action</div>
         <div class="editor-container">
             <div id="renderCode" class="editor">Write your render(ctx, parameters, state, action) function here...</div>
         </div>
-        <!-- <textarea id="renderCode" placeholder="Write your render(ctx, state, action) function here..."></textarea> -->
         </br>
         <div class="button-container">
             <div class="left-buttons">

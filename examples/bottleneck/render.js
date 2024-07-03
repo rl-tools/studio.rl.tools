@@ -1,4 +1,5 @@
-function render(ctx, parameters, state, action) {
+function render(ui_state, parameters, state, action) {
+    const ctx = ui_state.ctx
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     const canvasWidth = ctx.canvas.width;
     const canvasHeight = ctx.canvas.height;

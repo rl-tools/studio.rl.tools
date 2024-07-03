@@ -1,16 +1,20 @@
 
 
 window.addEventListener('load', () => {
+    let initFunction;
     let renderFunction;
+    let ui_state = null;
     let exampleStateAction;
     let exampleParameters;
     let stateActionLimits;
-    const canvas = document.getElementById('canvas');
-    const ctx = canvas.getContext('2d');
+    const package_index = {};
     const topSection = document.getElementById('topSection');
     const overlayToggle = document.getElementById('overlayToggle');
     const resizeHandle = document.getElementById('resizeHandle');
     const resizeHandleInner = document.getElementById('resizeHandleInner');
+    const canvas_container = document.querySelector('.canvas-container');
+
+    const ratio = window.devicePixelRatio || 1;
 
     function resizeEditor(editorContainer, editor){
         const rowHeight = editor.renderer.lineHeight || 20;
@@ -36,6 +40,8 @@ window.addEventListener('load', () => {
     const exampleStateActionEditor = makeEditor(exampleStateActionEditorContainer);
     const stateActionLimitsEditorContainer = document.getElementById('stateActionLimits')
     const stateActionLimitsEditor = makeEditor(stateActionLimitsEditorContainer);
+    const initCodeEditorContainer = document.getElementById('initCode')
+    const initCodeEditor = makeEditor(initCodeEditorContainer);
     const renderCodeEditorContainer = document.getElementById('renderCode')
     const renderCodeEditor = makeEditor(renderCodeEditorContainer);
 
@@ -52,11 +58,33 @@ window.addEventListener('load', () => {
     vimBindingsToggle.checked = vimBindingsEnabled;
     toggleVimBindings(vimBindingsEnabled);
 
+    const onResize = () => {
+        const canvas = canvas_container.querySelector('canvas');
+        const size = Math.min(canvas_container.clientWidth, canvas_container.clientHeight);
+        canvas.width = size * ratio;
+        canvas.height = size * ratio;
+
+        canvas.style.width = size + 'px';
+        canvas.style.height = size + 'px';
+        render()
+    }
+    onResize();
+    const resizeObserver = new ResizeObserver(entries => {
+        for (let entry of entries) {
+            if (entry.target === canvas_container) {
+                onResize();
+            }
+        }
+    });
+    window.addEventListener('resize', onResize);
+    resizeObserver.observe(canvas_container);
+
     
 
     async function loadDefaults(example, forceReload) {
         try {
             const renderResponse = await fetch(`./examples/${example}/render.js`);
+            const initResponse = await fetch(`./examples/${example}/init.js`);
             const exampleParametersResponse = await fetch(`./examples/${example}/example_parameters.json`);
             const exampleStateActionResponse = await fetch(`./examples/${example}/example_state_action.json`);
             const limitsResponse = await fetch(`./examples/${example}/limits_state_action.txt`);
@@ -79,6 +107,10 @@ window.addEventListener('load', () => {
             stateActionLimitsEditor.setValue(stateActionLimits, -1);
             resizeEditor(stateActionLimitsEditorContainer, stateActionLimitsEditor)
             localStorage.setItem("limits_state_action", stateActionLimits)
+
+            const initCode = localStorage.getItem("init") != null && !forceReload ? localStorage.getItem("init") : await initResponse.text();
+            initCodeEditor.setValue(initCode, -1);
+            resizeEditor(initCodeEditorContainer, initCodeEditor)
 
             const renderCode = localStorage.getItem("render") != null && !forceReload ? localStorage.getItem("render") : await renderResponse.text();
             renderCodeEditor.setValue(renderCode, -1);
@@ -115,11 +147,24 @@ window.addEventListener('load', () => {
             alert(`Error parsing state and action limits:\n${error}\nYou might want to reset to default values (button at the bottom of the page).`)
             return
         }
+        const initCode = initCodeEditor.getValue();
+        localStorage.setItem("init", initCode)
+
+        try {
+            const functionBody = initCode.substring(initCode.indexOf("{") + 1, initCode.lastIndexOf("}"));
+            initFunction = new Function('package_index', 'canvas', functionBody);
+            ui_state = null
+        }
+        catch (error) {
+            alert(`Error parsing the render function:\n${error.message}\nYou might want to reset to default values (button at the bottom of the page).`)
+            return
+        }
+
         const renderCode = renderCodeEditor.getValue();
         localStorage.setItem("render", renderCode)
         try {
             let functionBody = renderCode.substring(renderCode.indexOf("{") + 1, renderCode.lastIndexOf("}"));
-            renderFunction = new Function('ctx', 'parameters', 'state', 'action', functionBody);
+            renderFunction = new Function('ui_state', 'parameters', 'state', 'action', functionBody);
             render();
         }
         catch (error) {
@@ -202,11 +247,29 @@ window.addEventListener('load', () => {
         exampleStateActionEditorContainer.dispatchEvent(stateActionTextareaEvent);
     }
 
+    function init() {
+        if (initFunction) {
+            console.log("UI Init")
+            canvas_container.innerHTML = '';
+            const canvas = document.createElement('canvas');
+            canvas_container.appendChild(canvas);
+            ui_state = initFunction(package_index, canvas);
+            onResize()
+        }
+    }
+
     function render() {
-        if (renderFunction) {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            requestAnimationFrame(() => renderFunction(ctx, exampleParameters, exampleStateAction.state, exampleStateAction.action));
-            renderFunction(ctx, exampleParameters, exampleStateAction.state, exampleStateAction.action);
+        if (initFunction && renderFunction){
+            if(!ui_state){
+                init()
+            }
+            if(ui_state){
+                requestAnimationFrame(() => renderFunction(ui_state, exampleParameters, exampleStateAction.state, exampleStateAction.action));
+                // renderFunction(ui_state, exampleParameters, exampleStateAction.state, exampleStateAction.action);
+            }
+            else{
+                throw new Error('init function not successfull')
+            }
         }
     }
 
@@ -262,7 +325,13 @@ window.addEventListener('load', () => {
     if(urlParams.has('force')){
         default_environment = urlParams.get('force')
         forceReload = true;
-        topSection.style.height = `80vh`;
+        // topSection.style.height = `80vh`;
+    }
+    const current_version = "0.1.0"
+    if(localStorage.getItem("version") !== current_version){
+        forceReload = true;
+        localStorage.setItem("version", current_version)
+        console.log(`New version (${current_version}) detected, reloading defaults`)
     }
     loadDefaults(default_environment, forceReload);
     const updateButton = document.getElementById('updateButton');
@@ -271,28 +340,6 @@ window.addEventListener('load', () => {
     document.getElementById('resetButtonPendulum').addEventListener('click', () => resetButtonCallback("pendulum"));
     document.getElementById('resetButtonAcrobot').addEventListener('click', () => resetButtonCallback("acrobot"));
 
-    const ratio = window.devicePixelRatio || 1;
-
-    const canvas_container = document.querySelector('.canvas-container');
-    const onResize = () => {
-        const size = Math.min(canvas_container.clientWidth, canvas_container.clientHeight);
-        canvas.width = size * ratio;
-        canvas.height = size * ratio;
-
-        canvas.style.width = size + 'px';
-        canvas.style.height = size + 'px';
-        render()
-    }
-    onResize();
-    const resizeObserver = new ResizeObserver(entries => {
-        for (let entry of entries) {
-            if (entry.target === canvas_container) {
-                onResize();
-            }
-        }
-    });
-    window.addEventListener('resize', onResize);
-    resizeObserver.observe(canvas_container);
 
     function overlayToggleCallback(checked){
         if (checked) {
