@@ -20,6 +20,7 @@ window.addEventListener('load', () => {
         const numberOfRows = Math.max(3, editor.session.getLength());
         const newHeight = numberOfRows * rowHeight;
         editorContainer.style.height = `${newHeight}px`;
+        editorContainer.style.maxHeight = `90vh`;
         editor.resize();
     }
 

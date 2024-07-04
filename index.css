@@ -42,6 +42,9 @@ body {
     resize: vertical;
     box-sizing: border-box;
 }
+.editor{
+    max-height: 90vh;
+}
 
 textarea:focus {
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); /* Slightly larger shadow on focus for a subtle effect */
