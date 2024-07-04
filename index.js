@@ -273,6 +273,10 @@ window.addEventListener('load', () => {
             canvas_container.appendChild(canvas);
             resizeCanvas()
             ui_state = await initFunction(canvas, {devicePixelRatio: ratio});
+            if(ui_state.cursor_grab){
+                canvas.style.cursor = "grab"
+            }
+
         }
     }
 
