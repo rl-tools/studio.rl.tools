@@ -105,7 +105,7 @@ class Drone{
     // this.drone.quaternion.set(Math.sqrt(0.5), Math.sqrt(0.5), 0,0) // ENUtoNED
     this.imuGroup = new THREE.Group()
     this.imuGroup.position.set(...model.imu.pose.position)
-    this.imuGroup.quaternion.setFromRotationMatrix(Matrix4FromRotMat(model.imu.pose.orientation))
+    this.imuGroup.quaternion.set(model.imu.pose.orientation[3], model.imu.pose.orientation[0], model.imu.pose.orientation[1], model.imu.pose.orientation[2])
     if (displayIMUCoordinateSystem) {
       this.imuGroup.add((new CoordinateSystem([0, 0, 0], coordinateSystemLength, coordinateSystemThickness)).get())
     }
@@ -161,7 +161,7 @@ class Drone{
 
       const rotorGroup = new THREE.Group()
       rotorGroup.position.set(...rotor.pose.position)
-      rotorGroup.quaternion.setFromRotationMatrix(Matrix4FromRotMat(rotor.pose.orientation))
+      rotorGroup.quaternion.set(rotor.pose.orientation[3], rotor.pose.orientation[0], rotor.pose.orientation[1], rotor.pose.orientation[2])
       // rotorGroup.add((new CoordinateSystem([0, 0, 0], 0.1, 0.01)).get())
       const rotorCageForm = new THREE.TorusGeometry(rotorCageRadius, rotorCageThickness, 16, 32 );
       const cageMaterial = (rotor.spin_orientation_clockwise ? clockwise_rotor_material : counter_clockwise_rotor_material)// new THREE.MeshLambertMaterial({color: 0xAAAAAA})
