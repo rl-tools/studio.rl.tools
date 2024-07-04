@@ -30,7 +30,7 @@ function Matrix4FromRotMat(rotMat){
 
 
 class State{
-    constructor(canvas, parameters, {devicePixelRatio}){
+    constructor(canvas, {devicePixelRatio}){
         this.canvas = canvas
         this.devicePixelRatio = devicePixelRatio
     }
@@ -77,6 +77,8 @@ class State{
         this.camera.quaternion.set(-0.14, 0.70, 0.14, 0.68)
         this.controls.target.set(0.0, 0.0, 0.0)
         this.controls.update()
+
+        this.camera_set = false
     }
 
 }
@@ -91,15 +93,16 @@ class Drone{
     this.droneFrame = new THREE.Group()
     this.drone = new THREE.Group()
     // this.drone.add((new CoordinateSystem()).get())
-    // this.drone.add((new CoordinateSystem(10 * model.mass, 0.1 * model.mass)).get())
+    // this.drone.add((new CoordinateSystem(10 * this.scale, 0.1 * this.scale)).get())
+    this.scale = model.mass
     const material = new THREE.MeshLambertMaterial({color: 0xAAAAAA})
     const clockwise_rotor_material = new THREE.MeshLambertMaterial({color: 0x00FF00})
     const counter_clockwise_rotor_material = new THREE.MeshLambertMaterial({color: 0xFF0000})
 
-    const coordinateSystemLength = Math.cbrt(model.mass)
+    const coordinateSystemLength = Math.cbrt(this.scale)
     const coordinateSystemThickness = 0.01 * coordinateSystemLength
 
-    const centerSize = Math.cbrt(model.mass) / 10
+    const centerSize = Math.cbrt(this.scale) / 15
     const centerForm = new THREE.BoxGeometry(centerSize, centerSize, centerSize*0.3)
     const center = new THREE.Mesh( centerForm, material);
     // this.drone.quaternion.set(Math.sqrt(0.5), Math.sqrt(0.5), 0,0) // ENUtoNED
@@ -201,16 +204,28 @@ class Drone{
       const rot_rate = rotorState["power"]
       const force_magnitude = (rot_rate - avg_rot_rate)/max_rpm * 10///1000
       forceArrow.setDirection(new THREE.Vector3(0, 0, rot_rate)) //Math.sign(force_magnitude)))
-      forceArrow.setLength(Math.cbrt(this.model.mass)/10) //Math.abs(force_magnitude))
+      forceArrow.setLength(Math.cbrt(this.this.scale)/10) //Math.abs(force_magnitude))
     })
   }
 
 }
 
-export async function init(canvas, parameters, options){
-    const state = new State(canvas, parameters, options)
+export async function init(canvas, options){
+    const state = new State(canvas, options)
     await state.initialize()
-    state.drone = new Drone(parameters)
-    state.simulator.add(state.drone.get())
     return state
+}
+
+export async function episode_init(ui_state, parameters){
+    const camera_distance = (parameters.ui ? parameters.ui.camera_distance || 1 : 1)
+    const scale = parameters.mass/0.1 * camera_distance
+    if(!ui_state.camera_set){
+      ui_state.camera.position.set(3.3 * scale, 1.4 * scale, 0.00)
+      ui_state.camera_set = true
+    }
+    if(ui_state.drone){
+      ui_state.simulator.remove(ui_state.drone.get())
+    }
+    ui_state.drone = new Drone(parameters)
+    ui_state.simulator.add(ui_state.drone.get())
 }

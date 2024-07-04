@@ -1,5 +1,6 @@
 window.addEventListener('load', () => {
     let initFunction;
+    let episodeInitFunction;
     let renderFunction;
     let ui_state = null;
     let exampleStateAction;
@@ -24,12 +25,16 @@ window.addEventListener('load', () => {
         editor.resize();
     }
 
-    function makeEditor(element){
-        return ace.edit(element, {
-            mode: "ace/mode/javascript",
+    function makeEditor(element, javascript_mode = true){
+        const options = {
             selectionStyle: "text",
             theme: "ace/theme/tomorrow"
-        })
+        }
+        if(javascript_mode){
+            options.mode = "ace/mode/javascript"
+        }
+
+        return ace.edit(element, options)
     }
 
     const vimBindingsToggle = document.getElementById('vimBindingsToggle');
@@ -39,14 +44,14 @@ window.addEventListener('load', () => {
     const exampleStateActionEditorContainer = document.getElementById('exampleStateAction')
     const exampleStateActionEditor = makeEditor(exampleStateActionEditorContainer);
     const stateActionLimitsEditorContainer = document.getElementById('stateActionLimits')
-    const stateActionLimitsEditor = makeEditor(stateActionLimitsEditorContainer);
+    const stateActionLimitsEditor = makeEditor(stateActionLimitsEditorContainer, false);
     const initCodeEditorContainer = document.getElementById('initCode')
     const initCodeEditor = makeEditor(initCodeEditorContainer);
     const renderCodeEditorContainer = document.getElementById('renderCode')
     const renderCodeEditor = makeEditor(renderCodeEditorContainer);
 
     function toggleVimBindings(state){
-        for(const editor of [exampleParametersEditor, exampleStateActionEditor, stateActionLimitsEditor, renderCodeEditor]){
+        for(const editor of [exampleParametersEditor, exampleStateActionEditor, stateActionLimitsEditor, initCodeEditor, renderCodeEditor]){
             editor.setKeyboardHandler(state ? 'ace/keyboard/vim' : '');
         }
     }
@@ -157,6 +162,7 @@ window.addEventListener('load', () => {
             const url = URL.createObjectURL(blob);
             const module = await import(url);
             initFunction  = module.init
+            episodeInitFunction = module.episode_init
             URL.revokeObjectURL(url);
             ui_state = null
         }
@@ -264,7 +270,7 @@ window.addEventListener('load', () => {
             canvas.height = 500;
             canvas_container.appendChild(canvas);
             resizeCanvas()
-            ui_state = await initFunction(canvas, exampleParameters, {devicePixelRatio: ratio});
+            ui_state = await initFunction(canvas, {devicePixelRatio: ratio});
         }
     }
 
@@ -274,7 +280,9 @@ window.addEventListener('load', () => {
                 await init()
             }
             if(ui_state){
-
+                if(episodeInitFunction){
+                    await episodeInitFunction(ui_state, exampleParameters)
+                }
                 renderLoop.id += 1;
                 const current_id = renderLoop.id;
                 renderLoopsRunning[current_id] = true;

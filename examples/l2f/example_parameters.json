@@ -1,68 +1,95 @@
 {
-  "mass": 0.1,
+  "mass": 0.027,
   "rotors": [
-    {
-      "thrust_curve": {
-        "factor_1": 1
+      {
+          "thrust_curve": {
+              "factor_1": 1
+          },
+          "pose": {
+              "position": [
+                  0.028,
+                  -0.028,
+                  0
+              ],
+              "orientation": [
+                  1,
+                  0,
+                  0,
+                  0
+              ]
+          }
       },
-      "pose": {
-        "orientation": [0.0, 0.92388, 0.382683, 0.0],
-        "position": [
-          0.17677669529663687,
-          0.17677669529663687,
-          0.0
-        ]
-      }
-    },
-    {
-      "thrust_curve": {
-        "factor_1": 1
+      {
+          "thrust_curve": {
+              "factor_1": 1
+          },
+          "pose": {
+              "position": [
+                  -0.028,
+                  -0.028,
+                  0
+              ],
+              "orientation": [
+                  1,
+                  0,
+                  0,
+                  0
+              ]
+          }
       },
-      "pose": {
-        "orientation": [0.0, 0.92388, 0.382683, 0.0],
-        "position": [
-          -0.17677669529663687,
-          0.17677669529663687,
-          0.0
-        ]
-      }
-    },
-    {
-      "thrust_curve": {
-        "factor_1": 1
+      {
+          "thrust_curve": {
+              "factor_1": 1
+          },
+          "pose": {
+              "position": [
+                  -0.028,
+                  0.028,
+                  0
+              ],
+              "orientation": [
+                  1,
+                  0,
+                  0,
+                  0
+              ]
+          }
       },
-      "pose": {
-        "orientation": [0.0, 0.92388, 0.382683, 0.0],
-        "position": [
-          -0.17677669529663687,
-          -0.17677669529663687,
-          0.0
-        ]
+      {
+          "thrust_curve": {
+              "factor_1": 1
+          },
+          "pose": {
+              "position": [
+                  0.028,
+                  0.028,
+                  0
+              ],
+              "orientation": [
+                  1,
+                  0,
+                  0,
+                  0
+              ]
+          }
       }
-    },
-    {
-      "thrust_curve": {
-        "factor_1": 1
-      },
-      "pose": {
-        "orientation": [0.0, 0.92388, 0.382683, 0.0],
-        "position": [
-          0.17677669529663687,
-          -0.17677669529663687,
-          0.0
-        ]
-      }
-    }
   ],
   "imu": {
-    "pose": {
-      "orientation": [1.0, 0, 0, 0],
-      "position": [0.0, 0.0, 0.0]
-    }
+      "pose": {
+          "position": [
+              0,
+              0,
+              0
+          ],
+          "orientation": [
+              1,
+              0,
+              0,
+              0
+          ]
+      }
   },
-  "gravity": [
-    0.0,
-    0.0,
-    -9.81
-  ]
+  "ui": {
+    "camera_distance": 0.3
+  }
 }
