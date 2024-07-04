@@ -1,3 +1,5 @@
+const current_version = "0.1.1"
+
 window.addEventListener('load', () => {
     let initFunction;
     let episodeInitFunction;
@@ -368,7 +370,6 @@ window.addEventListener('load', () => {
         forceReload = true;
         // topSection.style.height = `80vh`;
     }
-    const current_version = "0.1.0"
     if(localStorage.getItem("version") !== current_version){
         forceReload = true;
         localStorage.setItem("version", current_version)

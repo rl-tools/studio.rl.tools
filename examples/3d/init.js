@@ -3,10 +3,9 @@ import {OrbitControls} from "three-orbitcontrols"
 
 
 class State{
-    constructor(canvas, parameters, {devicePixelRatio}){
+    constructor(canvas, {devicePixelRatio}){
         this.canvas = canvas
         this.devicePixelRatio = devicePixelRatio
-        this.parameters = parameters
     }
     async initialize(){
         const width = this.canvas.width
@@ -18,8 +17,7 @@ class State{
         this.renderer.setClearColor(0xffffff, 0);
         this.renderer.setSize(width/this.devicePixelRatio, height/this.devicePixelRatio);
         this.controls = new OrbitControls(this.camera, this.renderer.domElement);
-        this.box = new THREE.Mesh(new THREE.BoxGeometry(this.parameters.depth, this.parameters.height, this.parameters.width), new THREE.MeshLambertMaterial({color: 0x00FF00}));
-        this.scene.add(this.box)
+        this.box = null
         var light = new THREE.AmbientLight(0xffffff, 0.5);
         this.scene.add(light);
         let intensity = 0.2;
@@ -38,6 +36,13 @@ class State{
         this.controls.update()
     }
 
+}
+export async function episode_init(ui_state, parameters){
+    if(ui_state.box){
+        ui_state.scene.remove(ui_state.box)
+    }
+    ui_state.box = new THREE.Mesh(new THREE.BoxGeometry(parameters.depth, parameters.height, parameters.width), new THREE.MeshLambertMaterial({color: 0x6fd0cb})); //0x00FF00}));
+    ui_state.scene.add(ui_state.box)
 }
 export async function init(canvas, parameters, options){
     const state = new State(canvas, parameters, options)

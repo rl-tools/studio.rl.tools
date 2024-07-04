@@ -4,7 +4,6 @@ export async function render(ui_state, parameters, state, action) {
     ui_state.drone.drone.quaternion.copy(new THREE.Quaternion(state.orientation[1], state.orientation[2], state.orientation[3], state.orientation[0]).normalize())
     const width = ui_state.canvas.width/ui_state.devicePixelRatio
     const height = ui_state.canvas.height/ui_state.devicePixelRatio
-    console.log("Setting size to ", width, height)
     ui_state.camera.aspect =  width / height
     ui_state.camera.updateProjectionMatrix()
     ui_state.renderer.setPixelRatio(ui_state.devicePixelRatio)
